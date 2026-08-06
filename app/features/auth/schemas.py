@@ -12,3 +12,16 @@ class RegisterResponse(BaseModel):
     name: str
     email: str
     is_active: bool
+    
+    
+class LoginRequest(BaseModel):
+    email: str = Field(max_length=255)
+    password: str = Field(min_length=8 , max_length=128)
+    
+
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str
+    
+    

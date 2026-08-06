@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 from app.features.users.models import User
 from app.shared.security.hashing import hash_password
 from app.features.auth.schemas import RegisterRequest
+from app.features.auth.schemas import LoginRequest
+from app.shared.security.hashing import verify_password
 
 
 def register_user(
@@ -33,3 +35,42 @@ def register_user(
     db.refresh(user)
 
     return user
+
+
+
+
+
+def authenticate_user(
+    db: Session,
+    data: LoginRequest
+) -> User:
+
+    # Find user by email
+    user = db.scalar(
+        select(User).where(User.email == data.email)
+    )
+
+    # If user doesn't exist
+    if not user:
+        raise ValueError("Invalid email or password")
+
+    # Verify password
+    if not verify_password(
+        data.password,
+        user.password_hash
+    ):
+        raise ValueError("Invalid email or password")
+
+    # Authentication successful
+    return user
+    
+    
+        
+        
+        
+    
+        
+        
+    
+    
+    
