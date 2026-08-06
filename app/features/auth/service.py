@@ -49,20 +49,29 @@ def authenticate_user(
     user = db.scalar(
         select(User).where(User.email == data.email)
     )
+    print("Login Email:", data.email)
+    print("User Found:", user)
 
     # If user doesn't exist
-    if not user:
-        raise ValueError("Invalid email or password")
-
     # Verify password
-    if not verify_password(
+    
+    print("Entered Password:", data.password)
+    print("Stored Hash:", user.password_hash)
+
+    result = verify_password(
         data.password,
         user.password_hash
-    ):
-        raise ValueError("Invalid email or password")
+    )
 
+    print("Password Match:", result)
+    
+    if not result:
+        raise ValueError("Invalid email or password")
+        
     # Authentication successful
     return user
+
+   
     
     
         
