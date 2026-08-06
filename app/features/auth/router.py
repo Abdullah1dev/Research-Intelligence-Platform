@@ -6,6 +6,7 @@ from app.features.auth.service import register_user
 from app.infrastructure.database.config import get_db
 
 from fastapi import HTTPException, status
+from app.shared.security.jwt import create_access_token
 
 from app.features.auth.schemas import (
     LoginRequest,
@@ -51,10 +52,15 @@ def login(
 ):
     try:
         user = authenticate_user(db, data)
+        access_token = create_access_token(\
+            
+        {"sub": user.email}
+        
+        )
 
         return LoginResponse(
-            access_token="temporary-token",
-            token_type="bearer",
+        access_token=access_token,
+        token_type="bearer",
         )
 
     except ValueError as e:
