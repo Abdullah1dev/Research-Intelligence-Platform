@@ -14,6 +14,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.infrastructure.database.base import Base
 
 
+from app.shared.enums.roles import UserRole
+from sqlalchemy import Enum
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -34,6 +38,14 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(
         Boolean,
         default=True
+    )
+    
+    role: Mapped[UserRole] = mapped_column(
+        
+    Enum(UserRole),
+    default=UserRole.RESEARCHER,
+    nullable=False
+    
     )
 
     created_at: Mapped[datetime] = mapped_column(
