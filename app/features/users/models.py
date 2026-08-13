@@ -40,12 +40,13 @@ class User(Base):
         default=True
     )
     
-    role: Mapped[UserRole] = mapped_column(
-        
-    Enum(UserRole),
-    default=UserRole.RESEARCHER,
-    nullable=False
     
+    role: Mapped[UserRole] = mapped_column(
+    Enum(
+        UserRole,
+        values_callable=lambda enum: [member.value for member in enum]
+    ),
+    nullable=False
     )
 
     created_at: Mapped[datetime] = mapped_column(

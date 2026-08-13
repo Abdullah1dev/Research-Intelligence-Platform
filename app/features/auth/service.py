@@ -6,12 +6,14 @@ from app.shared.security.hashing import hash_password
 from app.features.auth.schemas import RegisterRequest
 from app.features.auth.schemas import LoginRequest
 from app.shared.security.hashing import verify_password
+from app.shared.enums.roles import UserRole
 
 
 def register_user(
     data: RegisterRequest,
     db: Session,
 ) -> User:
+
     # Check whether the email already exists
     existing_user = db.scalar(
         select(User).where(User.email == data.email)
@@ -28,6 +30,7 @@ def register_user(
         name=data.name,
         email=data.email,
         password_hash=hashed_password,
+        role=UserRole.RESEARCHER,
     )
 
     db.add(user)

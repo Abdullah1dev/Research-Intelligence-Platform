@@ -8,6 +8,15 @@ from app.infrastructure.database.config import get_db
 from fastapi import HTTPException, status
 from app.shared.security.jwt import create_access_token
 
+
+
+
+from fastapi import Depends
+
+from app.features.users.models import User
+from app.shared.enums.roles import UserRole
+from app.shared.security.authorization import require_roles
+
 from app.features.auth.schemas import (
     LoginRequest,
     LoginResponse,
@@ -68,3 +77,15 @@ def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(e),
         )
+
+
+@router.get("/admin-test")
+def admin_test(
+    current_user: User = Depends(
+        require_roles(UserRole.ADMIN)
+    ),
+):
+    return {
+        "message": "You are an admin",
+        "user": current_user.name,
+    }
