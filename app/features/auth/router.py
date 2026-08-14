@@ -55,28 +55,32 @@ def register(
     "/login",
     response_model=LoginResponse,
 )
+
 def login(
     data: LoginRequest,
     db: Session = Depends(get_db),
 ):
     try:
         user = authenticate_user(db, data)
-        access_token = create_access_token(\
-            
-        {"sub": user.email}
-        
+
+        access_token = create_access_token(
+            {
+                "sub": str(user.id)
+            }
         )
 
         return LoginResponse(
-        access_token=access_token,
-        token_type="bearer",
+            access_token=access_token,
+            token_type="bearer",
         )
 
     except ValueError as e:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=401,
             detail=str(e),
         )
+
+    
 
 
 @router.get("/admin-test")
