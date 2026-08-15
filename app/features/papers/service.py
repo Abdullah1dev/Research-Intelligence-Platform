@@ -13,7 +13,12 @@ def create_paper(
     paper = Paper(
         title=data.title,
         abstract=data.abstract,
-        content=data.content,
+        authors=data.authors,
+        publication_year=data.publication_year,
+        journal=data.journal,
+        doi=data.doi,
+        category=data.category,
+        pdf_url=data.pdf_url,
         owner_id=owner_id,
     )
 
