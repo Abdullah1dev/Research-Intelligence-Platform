@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 
 from app.features.papers.models import Paper
 from app.features.papers.schemas import PaperCreate
 
-
+#create paper
 def create_paper(
     data: PaperCreate,
     db: Session,
@@ -27,3 +28,16 @@ def create_paper(
     db.refresh(paper)
 
     return paper
+
+
+
+#get paper
+def get_papers(
+    db: Session,
+) -> list[Paper]:
+
+    result = db.scalars(
+        select(Paper)
+    ).all()
+
+    return result
