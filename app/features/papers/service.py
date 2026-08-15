@@ -3,6 +3,8 @@ from sqlalchemy import select
 
 from app.features.papers.models import Paper
 from app.features.papers.schemas import PaperCreate
+from app.features.users.enums import UserRole
+from app.features.users.models import User
 
 #create paper
 def create_paper(
@@ -34,10 +36,19 @@ def create_paper(
 #get paper
 def get_papers(
     db: Session,
+    current_user: User,
 ) -> list[Paper]:
 
-    result = db.scalars(
-        select(Paper)
-    ).all()
+    if current_user.role in {
+        UserRole.ADMIN,
+        UserRole.REVIEWER,
+    }:
+        return db.scalars(
+            select(Paper)
+        ).all()
 
-    return result
+    return db.scalars(
+        select(Paper).where(
+            Paper.owner_id == current_user.id
+        )
+    ).all()
