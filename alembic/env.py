@@ -5,6 +5,7 @@ from alembic import context
 from app.infrastructure.database.base import Base
 from app.infrastructure.database.config import engine
 from app.features.users.models import User
+from app.features.papers.models import Paper
 
 
 # this is the Alembic Config object, which provides

@@ -1,21 +1,21 @@
 from datetime import datetime
 
-from sqlalchemy import String, DateTime
-from sqlalchemy.orm import Mapped, mapped_column
+
+from sqlalchemy.orm import Mapped, mapped_column , relationship
 
 from app.infrastructure.database.base import Base
-
-
-from datetime import datetime
 
 from sqlalchemy import String, DateTime, Boolean
-from sqlalchemy.orm import Mapped, mapped_column
-
-from app.infrastructure.database.base import Base
 
 
 from app.shared.enums.roles import UserRole
 from sqlalchemy import Enum
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.features.papers.models import Paper
+
 
 
 class User(Base):
@@ -39,14 +39,13 @@ class User(Base):
         Boolean,
         default=True
     )
-    
-    
+
     role: Mapped[UserRole] = mapped_column(
-    Enum(
-        UserRole,
-        values_callable=lambda enum: [member.value for member in enum]
-    ),
-    nullable=False
+        Enum(
+            UserRole,
+            values_callable=lambda enum: [member.value for member in enum]
+        ),
+        nullable=False
     )
 
     created_at: Mapped[datetime] = mapped_column(
@@ -58,4 +57,8 @@ class User(Base):
         DateTime,
         default=datetime.utcnow,
         onupdate=datetime.utcnow
+    )
+
+    papers: Mapped[list["Paper"]] = relationship(
+        back_populates="owner"
     )
