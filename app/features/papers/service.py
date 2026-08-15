@@ -3,8 +3,9 @@ from sqlalchemy import select
 
 from app.features.papers.models import Paper
 from app.features.papers.schemas import PaperCreate
-from app.features.users.enums import UserRole
+from app.shared.enums.roles import UserRole
 from app.features.users.models import User
+
 
 #create paper
 def create_paper(
