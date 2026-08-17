@@ -144,3 +144,45 @@ def update_paper(
     db.refresh(paper)
 
     return paper
+
+
+
+#Delete Paper
+def delete_paper(
+    paper_id: int,
+    db: Session,
+    current_user: User,
+) -> None:
+
+    paper = db.scalar(
+        select(Paper).where(Paper.id == paper_id)
+    )
+
+    if not paper:
+        raise HTTPException(
+            status_code=404,
+            detail="Paper not found",
+        )
+
+    # Admin can delete any paper
+    if current_user.role == UserRole.ADMIN:
+        pass
+
+    # Researcher can delete only their own paper
+    elif current_user.role == UserRole.RESEARCHER:
+
+        if paper.owner_id != current_user.id:
+            raise HTTPException(
+                status_code=403,
+                detail="You are not allowed to delete this paper",
+            )
+
+    # Other roles cannot delete
+    else:
+        raise HTTPException(
+            status_code=403,
+            detail="You are not allowed to delete papers",
+        )
+
+    db.delete(paper)
+    db.commit()
