@@ -6,6 +6,9 @@ from app.features.papers.schemas import PaperCreate , PaperUpdate
 from app.shared.enums.roles import UserRole
 from app.features.users.models import User
 from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
+
+
 
 
 #create paper
@@ -28,11 +31,21 @@ def create_paper(
     )
 
     db.add(paper)
-    db.commit()
+
+    try:
+        db.commit()
+
+    except IntegrityError as e:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=409,
+            detail="A paper with this DOI already exists.",
+        )
+
     db.refresh(paper)
 
     return paper
-
 
 
 #get paper
