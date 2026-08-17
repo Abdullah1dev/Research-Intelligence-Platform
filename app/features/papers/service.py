@@ -26,7 +26,7 @@ def create_paper(
         journal=data.journal,
         doi=data.doi,
         category=data.category,
-        pdf_url=data.pdf_url,
+        pdf_url=str(data.pdf_url),
         owner_id=owner_id,
     )
 

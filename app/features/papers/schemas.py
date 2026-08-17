@@ -1,18 +1,50 @@
 from datetime import datetime
-
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict , HttpUrl , Field
 
 
 #Create Paper Schema
+
+
+
 class PaperCreate(BaseModel):
-    title: str
-    abstract: str | None = None
-    authors: str
-    publication_year: int | None = None
-    journal: str | None = None
-    doi: str | None = None
-    category: str | None = None
-    pdf_url: str | None = None
+    title: str = Field(
+        min_length=1,
+        max_length=500
+    )
+
+    abstract: str = Field(
+        min_length=1
+    )
+
+    authors: str = Field(
+        min_length=1,
+        max_length=1000
+    )
+
+    publication_year: int = Field(
+        ge=1900,
+        le=2100
+    )
+
+    journal: str = Field(
+        min_length=1,
+        max_length=255
+    )
+
+    doi: str = Field(
+        min_length=1,
+        max_length=255
+    )
+
+    category: str = Field(
+        min_length=1,
+        max_length=100
+    )
+
+    pdf_url: HttpUrl
+
+
+
 
 
 #Paper Response Schema
