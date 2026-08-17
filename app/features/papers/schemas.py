@@ -3,6 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict
 
 
+#Create Paper Schema
 class PaperCreate(BaseModel):
     title: str
     abstract: str | None = None
@@ -14,6 +15,7 @@ class PaperCreate(BaseModel):
     pdf_url: str | None = None
 
 
+#Paper Response Schema
 class PaperResponse(BaseModel):
     id: int
     title: str
@@ -29,3 +31,15 @@ class PaperResponse(BaseModel):
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+    
+
+#update paper Schema
+class PaperUpdate(BaseModel):
+    title: str
+    abstract: str
+    authors: str
+    publication_year: int
+    journal: str
+    doi: str
+    category: str
+    pdf_url: str

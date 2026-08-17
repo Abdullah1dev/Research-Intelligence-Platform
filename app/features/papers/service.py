@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 
 from app.features.papers.models import Paper
-from app.features.papers.schemas import PaperCreate
+from app.features.papers.schemas import PaperCreate , PaperUpdate
 from app.shared.enums.roles import UserRole
 from app.features.users.models import User
 from fastapi import HTTPException
@@ -88,5 +88,59 @@ def get_paper_by_id(
             status_code=403,
             detail="You are not allowed to access this paper",
         )
+
+    return paper
+
+
+
+#Update Paper
+def update_paper(
+    paper_id: int,
+    data: PaperUpdate,
+    db: Session,
+    current_user: User,
+) -> Paper:
+
+    paper = db.scalar(
+        select(Paper).where(Paper.id == paper_id)
+    )
+
+    if not paper:
+        raise HTTPException(
+            status_code=404,
+            detail="Paper not found",
+        )
+
+    # Admin can update any paper
+    if current_user.role == UserRole.ADMIN:
+        pass
+
+    # Researcher can update only their own paper
+    elif current_user.role == UserRole.RESEARCHER:
+
+        if paper.owner_id != current_user.id:
+            raise HTTPException(
+                status_code=403,
+                detail="You are not allowed to update this paper",
+            )
+
+    # Other roles are not allowed
+    else:
+        raise HTTPException(
+            status_code=403,
+            detail="You are not allowed to update papers",
+        )
+
+    paper.title = data.title
+    paper.abstract = data.abstract
+    paper.authors = data.authors
+    paper.publication_year = data.publication_year
+    paper.journal = data.journal
+    paper.doi = data.doi
+    paper.category = data.category
+    paper.pdf_url = data.pdf_url
+
+    db.commit()
+    db.refresh(paper)
 
     return paper
