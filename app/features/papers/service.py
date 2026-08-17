@@ -5,6 +5,7 @@ from app.features.papers.models import Paper
 from app.features.papers.schemas import PaperCreate
 from app.shared.enums.roles import UserRole
 from app.features.users.models import User
+from fastapi import HTTPException
 
 
 #create paper
@@ -53,3 +54,39 @@ def get_papers(
             Paper.owner_id == current_user.id
         )
     ).all()
+    
+
+
+#get paper by id
+
+def get_paper_by_id(
+    paper_id: int,
+    db: Session,
+    current_user: User,
+) -> Paper:
+
+    paper = db.scalar(
+        select(Paper).where(Paper.id == paper_id)
+    )
+
+    if not paper:
+        raise HTTPException(
+            status_code=404,
+            detail="Paper not found",
+        )
+
+    # Admins and reviewers can access any paper
+    if current_user.role in {
+        UserRole.ADMIN,
+        UserRole.REVIEWER,
+    }:
+        return paper
+
+    # Researchers can only access their own papers
+    if paper.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="You are not allowed to access this paper",
+        )
+
+    return paper

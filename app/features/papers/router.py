@@ -6,7 +6,7 @@ from app.features.auth.dependencies import get_current_user
 from app.features.papers.models import Paper
 from app.features.papers.schemas import PaperCreate, PaperResponse
 from app.features.users.models import User
-from app.features.papers.service import create_paper, get_papers
+from app.features.papers.service import create_paper, get_papers , get_paper_by_id
 
 
 router = APIRouter(
@@ -43,6 +43,25 @@ def get_all_papers(
     current_user: User = Depends(get_current_user),
 ):
     return get_papers(
+        db=db,
+        current_user=current_user,
+    )
+    
+
+
+#get paper by single id
+
+@router.get(
+    "/{paper_id}",
+    response_model=PaperResponse,
+)
+def get_single_paper(
+    paper_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return get_paper_by_id(
+        paper_id=paper_id,
         db=db,
         current_user=current_user,
     )
