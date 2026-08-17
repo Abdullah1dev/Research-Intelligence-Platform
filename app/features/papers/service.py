@@ -9,6 +9,18 @@ from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 
 
+#helper function for commit paper and for better error handling
+def commit_paper(db: Session) -> None:
+    try:
+        db.commit()
+
+    except IntegrityError:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=409,
+            detail="A paper with this DOI already exists.",
+        )
 
 
 #create paper
