@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 from app.infrastructure.database.config import get_db
 from app.features.auth.dependencies import get_current_user
 from app.features.papers.models import Paper
-from app.features.papers.schemas import PaperCreate, PaperResponse
+from app.features.papers.schemas import PaperCreate, PaperResponse , PaperUpdate
 from app.features.users.models import User
-from app.features.papers.service import create_paper, get_papers , get_paper_by_id
+from app.features.papers.service import create_paper, get_papers , get_paper_by_id , update_paper
 
 
 router = APIRouter(
@@ -62,6 +62,25 @@ def get_single_paper(
 ):
     return get_paper_by_id(
         paper_id=paper_id,
+        db=db,
+        current_user=current_user,
+    )
+    
+    
+
+@router.put(
+    "/{paper_id}",
+    response_model=PaperResponse,
+)
+def update_single_paper(
+    paper_id: int,
+    data: PaperUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return update_paper(
+        paper_id=paper_id,
+        data=data,
         db=db,
         current_user=current_user,
     )
