@@ -6,7 +6,7 @@ from app.features.auth.dependencies import get_current_user
 from app.features.papers.models import Paper
 from app.features.papers.schemas import PaperCreate, PaperResponse , PaperUpdate
 from app.features.users.models import User
-from app.features.papers.service import create_paper, get_papers , get_paper_by_id , update_paper
+from app.features.papers.service import create_paper, get_papers , get_paper_by_id , update_paper ,  delete_paper
 
 
 router = APIRouter(
@@ -81,6 +81,25 @@ def update_single_paper(
     return update_paper(
         paper_id=paper_id,
         data=data,
+        db=db,
+        current_user=current_user,
+    )
+    
+    
+
+
+#delete paper
+@router.delete(
+    "/{paper_id}",
+    status_code=204,
+)
+def delete_single_paper(
+    paper_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    delete_paper(
+        paper_id=paper_id,
         db=db,
         current_user=current_user,
     )
