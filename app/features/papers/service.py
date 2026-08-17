@@ -151,9 +151,21 @@ def update_paper(
     paper.journal = data.journal
     paper.doi = data.doi
     paper.category = data.category
-    paper.pdf_url = data.pdf_url
+    paper.pdf_url = str(data.pdf_url)
+    
+    try:
+        db.commit()
+    
 
-    db.commit()
+    except IntegrityError:
+        db.rollback()
+    
+
+        raise HTTPException(
+            status_code=409,
+            detail="A paper with this DOI already exists.",
+        )
+
     db.refresh(paper)
 
     return paper

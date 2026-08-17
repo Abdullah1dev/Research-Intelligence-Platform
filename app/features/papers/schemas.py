@@ -67,11 +67,38 @@ class PaperResponse(BaseModel):
 
 #update paper Schema
 class PaperUpdate(BaseModel):
-    title: str
-    abstract: str
-    authors: str
-    publication_year: int
-    journal: str
-    doi: str
-    category: str
-    pdf_url: str
+    title: str = Field(
+        min_length=1,
+        max_length=500
+    )
+
+    abstract: str = Field(
+        min_length=1
+    )
+
+    authors: str = Field(
+        min_length=1,
+        max_length=1000
+    )
+
+    publication_year: int = Field(
+        ge=1900,
+        le=2100
+    )
+
+    journal: str = Field(
+        min_length=1,
+        max_length=255
+    )
+
+    doi: str = Field(
+        min_length=1,
+        max_length=255
+    )
+
+    category: str = Field(
+        min_length=1,
+        max_length=100
+    )
+
+    pdf_url: HttpUrl
