@@ -14,13 +14,16 @@ def commit_paper(db: Session) -> None:
     try:
         db.commit()
 
-    except IntegrityError:
+    except IntegrityError as exc:
         db.rollback()
 
-        raise HTTPException(
-            status_code=409,
-            detail="A paper with this DOI already exists.",
-        )
+        if "papers_doi_key" in str(exc.orig):
+            raise HTTPException(
+                status_code=409,
+                detail="A paper with this DOI already exists.",
+            )
+
+        raise
 
 
 #create paper
@@ -42,18 +45,11 @@ def create_paper(
         owner_id=owner_id,
     )
 
+    
+
     db.add(paper)
 
-    try:
-        db.commit()
-
-    except IntegrityError as e:
-        db.rollback()
-
-        raise HTTPException(
-            status_code=409,
-            detail="A paper with this DOI already exists.",
-        )
+    commit_paper(db)
 
     db.refresh(paper)
 
@@ -165,18 +161,7 @@ def update_paper(
     paper.category = data.category
     paper.pdf_url = str(data.pdf_url)
     
-    try:
-        db.commit()
-    
-
-    except IntegrityError:
-        db.rollback()
-    
-
-        raise HTTPException(
-            status_code=409,
-            detail="A paper with this DOI already exists.",
-        )
+    commit_paper(db)
 
     db.refresh(paper)
 
