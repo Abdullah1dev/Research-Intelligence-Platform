@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select , func
+from sqlalchemy import select , func , or_
 
 from app.features.papers.models import Paper
 from app.features.papers.schemas import PaperCreate , PaperUpdate
@@ -56,6 +56,7 @@ def create_paper(
     return paper
 
 
+
 #get paper
 def get_papers(
     db: Session,
@@ -64,6 +65,7 @@ def get_papers(
     limit: int,
     category: str | None = None,
     publication_year: int | None = None,
+    search: str | None = None,
 ):
     offset = (page - 1) * limit
 
@@ -78,6 +80,7 @@ def get_papers(
         .where(Paper.owner_id == current_user.id)
     )
 
+    # Category filter
     if category is not None:
         total_query = total_query.where(
             Paper.category == category
@@ -87,6 +90,7 @@ def get_papers(
             Paper.category == category
         )
 
+    # Publication year filter
     if publication_year is not None:
         total_query = total_query.where(
             Paper.publication_year == publication_year
@@ -96,8 +100,28 @@ def get_papers(
             Paper.publication_year == publication_year
         )
 
+    # Search
+    if search is not None:
+        search_pattern = f"%{search}%"
+
+        total_query = total_query.where(
+            or_(
+                Paper.title.ilike(search_pattern),
+                Paper.authors.ilike(search_pattern),
+            )
+        )
+
+        papers_query = papers_query.where(
+            or_(
+                Paper.title.ilike(search_pattern),
+                Paper.authors.ilike(search_pattern),
+            )
+        )
+
+    # Total matching papers
     total = db.execute(total_query).scalar_one()
 
+    # Pagination
     papers_query = (
         papers_query
         .offset(offset)
