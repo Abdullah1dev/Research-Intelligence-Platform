@@ -64,6 +64,14 @@ class PaperResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
     
+    
+class PaginatedPaperResponse(BaseModel):
+    items: list[PaperResponse]
+    page: int
+    limit: int
+    total: int
+    total_pages: int
+    
 
 #update paper Schema
 class PaperUpdate(BaseModel):

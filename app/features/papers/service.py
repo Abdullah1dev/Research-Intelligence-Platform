@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select , func
 
 from app.features.papers.models import Paper
 from app.features.papers.schemas import PaperCreate , PaperUpdate
@@ -65,16 +65,34 @@ def get_papers(
 ):
     offset = (page - 1) * limit
 
-    query = (
+    total_query = (
+        select(func.count())
+        .select_from(Paper)
+        .where(Paper.owner_id == current_user.id)
+    )
+
+    total = db.execute(total_query).scalar_one()
+
+    papers_query = (
         select(Paper)
         .where(Paper.owner_id == current_user.id)
         .offset(offset)
         .limit(limit)
     )
 
-    result = db.execute(query)
+    result = db.execute(papers_query)
 
-    return result.scalars().all()
+    papers = result.scalars().all()
+
+    total_pages = (total + limit - 1) // limit
+
+    return {
+        "items": papers,
+        "page": page,
+        "limit": limit,
+        "total": total,
+        "total_pages": total_pages,
+    }
     
 
 

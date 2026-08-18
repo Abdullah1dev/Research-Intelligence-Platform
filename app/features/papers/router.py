@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 from app.infrastructure.database.config import get_db
 from app.features.auth.dependencies import get_current_user
 from app.features.papers.models import Paper
-from app.features.papers.schemas import PaperCreate, PaperResponse , PaperUpdate
+from app.features.papers.schemas import PaperCreate, PaperResponse , PaperUpdate , PaginatedPaperResponse
 from app.features.users.models import User
-from app.features.papers.service import create_paper, get_papers , get_paper_by_id , update_paper ,  delete_paper
+from app.features.papers.service import create_paper, get_papers , get_paper_by_id , update_paper ,  delete_paper 
 
 
 router = APIRouter(
@@ -34,7 +34,7 @@ def create(
     
 
 #get paper
-@router.get("/")
+@router.get("/", response_model=PaginatedPaperResponse)
 def get_all_papers(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
