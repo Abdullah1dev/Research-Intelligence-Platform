@@ -62,6 +62,8 @@ def get_papers(
     current_user,
     page: int,
     limit: int,
+    category: str | None = None,
+    publication_year: int | None = None,
 ):
     offset = (page - 1) * limit
 
@@ -71,11 +73,33 @@ def get_papers(
         .where(Paper.owner_id == current_user.id)
     )
 
-    total = db.execute(total_query).scalar_one()
-
     papers_query = (
         select(Paper)
         .where(Paper.owner_id == current_user.id)
+    )
+
+    if category is not None:
+        total_query = total_query.where(
+            Paper.category == category
+        )
+
+        papers_query = papers_query.where(
+            Paper.category == category
+        )
+
+    if publication_year is not None:
+        total_query = total_query.where(
+            Paper.publication_year == publication_year
+        )
+
+        papers_query = papers_query.where(
+            Paper.publication_year == publication_year
+        )
+
+    total = db.execute(total_query).scalar_one()
+
+    papers_query = (
+        papers_query
         .offset(offset)
         .limit(limit)
     )

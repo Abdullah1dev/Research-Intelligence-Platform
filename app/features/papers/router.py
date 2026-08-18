@@ -38,6 +38,8 @@ def create(
 def get_all_papers(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
+    category: str | None = Query(None),
+    publication_year: int | None = Query(None),
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user),
 ):
@@ -46,6 +48,8 @@ def get_all_papers(
         current_user=current_user,
         page=page,
         limit=limit,
+        category=category,
+        publication_year=publication_year,
     )
     
 
