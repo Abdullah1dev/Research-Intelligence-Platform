@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status , Query
 from sqlalchemy.orm import Session
 
 from app.infrastructure.database.config import get_db
@@ -34,17 +34,18 @@ def create(
     
 
 #get paper
-@router.get(
-    "/",
-    response_model=list[PaperResponse],
-)
+@router.get("/")
 def get_all_papers(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user = Depends(get_current_user),
 ):
     return get_papers(
         db=db,
         current_user=current_user,
+        page=page,
+        limit=limit,
     )
     
 

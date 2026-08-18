@@ -59,22 +59,22 @@ def create_paper(
 #get paper
 def get_papers(
     db: Session,
-    current_user: User,
-) -> list[Paper]:
+    current_user,
+    page: int,
+    limit: int,
+):
+    offset = (page - 1) * limit
 
-    if current_user.role in {
-        UserRole.ADMIN,
-        UserRole.REVIEWER,
-    }:
-        return db.scalars(
-            select(Paper)
-        ).all()
+    query = (
+        select(Paper)
+        .where(Paper.owner_id == current_user.id)
+        .offset(offset)
+        .limit(limit)
+    )
 
-    return db.scalars(
-        select(Paper).where(
-            Paper.owner_id == current_user.id
-        )
-    ).all()
+    result = db.execute(query)
+
+    return result.scalars().all()
     
 
 
