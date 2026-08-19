@@ -41,8 +41,10 @@ def get_all_papers(
     category: str | None = Query(None),
     publication_year: int | None = Query(None),
     search: str | None = Query(None),
+    sort_by: str = Query("created_at"),
+    order: str = Query("desc"),
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_user),
+    current_user=Depends(get_current_user),
 ):
     return get_papers(
         db=db,
@@ -52,6 +54,8 @@ def get_all_papers(
         category=category,
         publication_year=publication_year,
         search=search,
+        sort_by=sort_by,
+        order=order,
     )
     
 
