@@ -7,7 +7,7 @@ from app.features.papers.models import Paper
 from app.features.papers.schemas import PaperCreate, PaperResponse , PaperUpdate , PaginatedPaperResponse
 from app.features.users.models import User
 from app.features.papers.service import create_paper, get_papers , get_paper_by_id , update_paper ,  delete_paper 
-
+from app.features.papers.enums import PaperSortField, SortOrder
 
 router = APIRouter(
     prefix="/papers",
@@ -38,11 +38,21 @@ def create(
 def get_all_papers(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
+
     category: str | None = Query(None),
     publication_year: int | None = Query(None),
     search: str | None = Query(None),
-    sort_by: str = Query("created_at"),
-    order: str = Query("desc"),
+
+    sort_by: PaperSortField = Query(
+        PaperSortField.CREATED_AT,
+        description="Field used to sort papers."
+    ),
+
+    order: SortOrder = Query(
+        SortOrder.DESC,
+        description="Sorting direction."
+    ),
+
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
