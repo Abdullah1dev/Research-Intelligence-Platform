@@ -66,6 +66,8 @@ def get_papers(
     category: str | None = None,
     publication_year: int | None = None,
     search: str | None = None,
+    sort_by: str = "created_at",
+    order: str = "desc",
 ):
     offset = (page - 1) * limit
 
@@ -90,7 +92,7 @@ def get_papers(
             Paper.category == category
         )
 
-    # Publication year filter
+    # Year filter
     if publication_year is not None:
         total_query = total_query.where(
             Paper.publication_year == publication_year
@@ -104,21 +106,44 @@ def get_papers(
     if search is not None:
         search_pattern = f"%{search}%"
 
-        total_query = total_query.where(
-            or_(
-                Paper.title.ilike(search_pattern),
-                Paper.authors.ilike(search_pattern),
-            )
+        search_condition = or_(
+            Paper.title.ilike(search_pattern),
+            Paper.authors.ilike(search_pattern),
         )
 
-        papers_query = papers_query.where(
-            or_(
-                Paper.title.ilike(search_pattern),
-                Paper.authors.ilike(search_pattern),
-            )
+        total_query = total_query.where(search_condition)
+        papers_query = papers_query.where(search_condition)
+
+    # Sorting
+    valid_sort_fields = {
+        "title": Paper.title,
+        "publication_year": Paper.publication_year,
+        "created_at": Paper.created_at,
+    }
+
+    if sort_by not in valid_sort_fields:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid sort field"
         )
 
-    # Total matching papers
+    sort_column = valid_sort_fields[sort_by]
+
+    if order == "asc":
+        papers_query = papers_query.order_by(
+            sort_column.asc()
+        )
+    elif order == "desc":
+        papers_query = papers_query.order_by(
+            sort_column.desc()
+        )
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="Order must be 'asc' or 'desc'"
+        )
+
+    # Count
     total = db.execute(total_query).scalar_one()
 
     # Pagination
@@ -141,7 +166,6 @@ def get_papers(
         "total": total,
         "total_pages": total_pages,
     }
-    
 
 
 #get paper by id
