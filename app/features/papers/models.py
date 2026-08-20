@@ -78,7 +78,13 @@ class Paper(Base):
     owner: Mapped["User"] = relationship(
         back_populates="papers"
     )
-
+    
+    document = relationship(
+    "PaperDocument",
+    back_populates="paper",
+    uselist=False,
+    cascade="all, delete-orphan"
+    )
 
 
 #Paper Document Modle
