@@ -144,4 +144,5 @@ async def upload_document(
         db=db,
         paper_id=paper_id,
         file=file,
+        current_user=current_user,
     )

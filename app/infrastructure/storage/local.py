@@ -24,7 +24,9 @@ class LocalStorage:
         unique_name = f"{uuid4()}{file_extension}"
 
         file_path = folder_path / unique_name
-
+        
+        file_size = 0
+        
         with file_path.open("wb") as buffer:
             while chunk := await file.read(1024 * 1024):
                 buffer.write(chunk)
