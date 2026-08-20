@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status , Query
+from fastapi import APIRouter, Depends, status , Query , UploadFile , File 
 from sqlalchemy.orm import Session
 
 from app.infrastructure.database.config import get_db
@@ -8,6 +8,8 @@ from app.features.papers.schemas import PaperCreate, PaperResponse , PaperUpdate
 from app.features.users.models import User
 from app.features.papers.service import create_paper, get_papers , get_paper_by_id , update_paper ,  delete_paper 
 from app.features.papers.enums import PaperSortField, SortOrder
+from app.features.papers.schemas import PaperDocumentResponse
+from app.features.papers.service import upload_paper_document
 
 router = APIRouter(
     prefix="/papers",
@@ -123,4 +125,23 @@ def delete_single_paper(
         paper_id=paper_id,
         db=db,
         current_user=current_user,
+    )
+    
+
+#upload paper document
+@router.post(
+    "/{paper_id}/document",
+    response_model=PaperDocumentResponse,
+    status_code=201,
+)
+async def upload_document(
+    paper_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    return await upload_paper_document(
+        db=db,
+        paper_id=paper_id,
+        file=file,
     )
