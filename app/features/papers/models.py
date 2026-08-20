@@ -78,3 +78,61 @@ class Paper(Base):
     owner: Mapped["User"] = relationship(
         back_populates="papers"
     )
+
+
+
+#Paper Document Modle
+class PaperDocument(Base):
+    __tablename__ = "paper_documents"
+
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    paper_id: Mapped[int] = mapped_column(
+        ForeignKey("papers.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+        index=True
+    )
+
+    file_name: Mapped[str] = mapped_column(
+        String,
+        nullable=False
+    )
+
+    file_size: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False
+    )
+
+    mime_type: Mapped[str] = mapped_column(
+        String,
+        nullable=False
+    )
+
+    storage_key: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+        unique=True
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False
+    )
+
+    paper = relationship(
+        "Paper",
+        back_populates="document"
+    )
