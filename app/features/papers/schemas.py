@@ -115,3 +115,14 @@ class PaperUpdate(BaseModel):
     
 
 
+class PaperDocumentResponse(BaseModel):
+    id: int
+    paper_id: int
+    file_name: str
+    file_size: int
+    mime_type: str
+    storage_key: str
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
