@@ -5,9 +5,14 @@ from app.features.papers.models import Paper
 from app.features.papers.schemas import PaperCreate , PaperUpdate
 from app.shared.enums.roles import UserRole
 from app.features.users.models import User
-from fastapi import HTTPException
+from fastapi import HTTPException , UploadFile
 from sqlalchemy.exc import IntegrityError
+from app.infrastructure.storage.local import LocalStorage
+from app.features.papers.models import Paper, PaperDocument
 
+
+
+storage = LocalStorage()
 
 
 #helper function for commit paper and for better error handling
@@ -299,3 +304,62 @@ def delete_paper(
 
     db.delete(paper)
     db.commit()
+
+
+
+#upload paper document function
+async def upload_paper_document(
+    db: Session,
+    paper_id: int,
+    file: UploadFile,
+):
+    # 1. Find the paper
+    paper = db.query(Paper).filter(Paper.id == paper_id).first()
+
+    if not paper:
+        raise HTTPException(
+            status_code=404,
+            detail="Paper not found"
+        )
+
+    # 2. Check whether this paper already has a document
+    existing_document = (
+        db.query(PaperDocument)
+        .filter(PaperDocument.paper_id == paper_id)
+        .first()
+    )
+
+    if existing_document:
+        raise HTTPException(
+            status_code=409,
+            detail="Paper already has a document"
+        )
+
+    # 3. Validate file type
+    if file.content_type != "application/pdf":
+        raise HTTPException(
+            status_code=400,
+            detail="Only PDF files are allowed"
+        )
+
+    # 4. Save the file
+    storage_key, file_size = await storage.save(
+        file,
+        f"papers/{paper_id}"
+    )
+
+    # 5. Create database record
+    document = PaperDocument(
+        paper_id=paper_id,
+        file_name=file.filename,
+        file_size=file_size,
+        mime_type=file.content_type,
+        storage_key=storage_key,
+    )
+
+    # 6. Save database record
+    db.add(document)
+    db.commit()
+    db.refresh(document)
+
+    return document
