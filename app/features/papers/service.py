@@ -312,9 +312,13 @@ async def upload_paper_document(
     db: Session,
     paper_id: int,
     file: UploadFile,
+    current_user,
 ):
-    # 1. Find the paper
-    paper = db.query(Paper).filter(Paper.id == paper_id).first()
+    # 1. Find the paper AND verify ownership
+    paper = db.query(Paper).filter(
+        Paper.id == paper_id,
+        Paper.owner_id == current_user.id
+    ).first()
 
     if not paper:
         raise HTTPException(
@@ -322,7 +326,7 @@ async def upload_paper_document(
             detail="Paper not found"
         )
 
-    # 2. Check whether this paper already has a document
+    # 2. Check whether the paper already has a document
     existing_document = (
         db.query(PaperDocument)
         .filter(PaperDocument.paper_id == paper_id)
