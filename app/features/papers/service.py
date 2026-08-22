@@ -399,3 +399,43 @@ def get_paper_document(
         )
 
     return document
+
+
+#function to get the actual pdf
+def get_paper_document_file(
+    db: Session,
+    paper_id: int,
+    current_user,
+):
+    paper = db.query(Paper).filter(
+        Paper.id == paper_id,
+        Paper.owner_id == current_user.id
+    ).first()
+
+    if not paper:
+        raise HTTPException(
+            status_code=404,
+            detail="Paper not found"
+        )
+
+    document = (
+        db.query(PaperDocument)
+        .filter(PaperDocument.paper_id == paper_id)
+        .first()
+    )
+
+    if not document:
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found"
+        )
+
+    file_path = storage.get_path(document.storage_key)
+
+    if not file_path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail="Document file not found in storage"
+        )
+
+    return file_path, document
