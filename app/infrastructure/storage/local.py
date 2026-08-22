@@ -31,8 +31,16 @@ class LocalStorage:
             while chunk := await file.read(1024 * 1024):
                 buffer.write(chunk)
                 file_size += len(chunk)
+                
+        storage_key = str(Path(folder) / unique_name)
+        
+        return storage_key, file_size
 
-        return str(file_path) , file_size
+        
+    
+    
+    def get_path(self, storage_key: str) -> Path:
+        return self.base_path / storage_key
 
 
 

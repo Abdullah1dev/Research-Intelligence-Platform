@@ -10,11 +10,16 @@ from app.features.papers.service import create_paper, get_papers , get_paper_by_
 from app.features.papers.enums import PaperSortField, SortOrder
 from app.features.papers.schemas import PaperDocumentResponse
 from app.features.papers.service import upload_paper_document
-
+from fastapi.responses import FileResponse
+from app.features.papers.service import (
+    get_paper_document_file,
+)
 from app.features.papers.service import (
     upload_paper_document,
     get_paper_document,
 )
+
+
 
 router = APIRouter(
     prefix="/papers",
@@ -154,7 +159,7 @@ async def upload_document(
     
 
 
-#get the paper document
+#get the paper document metadata
 @router.get(
     "/{paper_id}/document",
     response_model=PaperDocumentResponse,
@@ -168,4 +173,26 @@ def get_document(
         db=db,
         paper_id=paper_id,
         current_user=current_user,
+    )
+    
+    
+#get the actual pdf
+@router.get(
+    "/{paper_id}/document/download",
+)
+def download_document(
+    paper_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    file_path, document = get_paper_document_file(
+        db=db,
+        paper_id=paper_id,
+        current_user=current_user,
+    )
+
+    return FileResponse(
+        path=file_path,
+        media_type=document.mime_type,
+        filename=document.file_name,
     )
