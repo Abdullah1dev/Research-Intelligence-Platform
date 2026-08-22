@@ -439,3 +439,42 @@ def get_paper_document_file(
         )
 
     return file_path, document
+
+
+#delete actual  pdf
+def delete_paper_document(
+    db: Session,
+    paper_id: int,
+    current_user,
+):
+    paper = db.query(Paper).filter(
+        Paper.id == paper_id,
+        Paper.owner_id == current_user.id
+    ).first()
+
+    if not paper:
+        raise HTTPException(
+            status_code=404,
+            detail="Paper not found"
+        )
+
+    document = (
+        db.query(PaperDocument)
+        .filter(PaperDocument.paper_id == paper_id)
+        .first()
+    )
+
+    if not document:
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found"
+        )
+
+    storage.delete(document.storage_key)
+
+    db.delete(document)
+    db.commit()
+
+    return {
+        "message": "Paper document deleted successfully"
+    }

@@ -41,7 +41,15 @@ class LocalStorage:
     
     def get_path(self, storage_key: str) -> Path:
         return self.base_path / storage_key
+    
+    def delete(self, storage_key: str) -> None:
+        file_path = self.get_path(storage_key)
+        
+        if file_path.exists():
+                file_path.unlink()
+        
 
+    
 
 
 
