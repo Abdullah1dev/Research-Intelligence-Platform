@@ -11,6 +11,11 @@ from app.features.papers.enums import PaperSortField, SortOrder
 from app.features.papers.schemas import PaperDocumentResponse
 from app.features.papers.service import upload_paper_document
 
+from app.features.papers.service import (
+    upload_paper_document,
+    get_paper_document,
+)
+
 router = APIRouter(
     prefix="/papers",
     tags=["Papers"],
@@ -144,5 +149,23 @@ async def upload_document(
         db=db,
         paper_id=paper_id,
         file=file,
+        current_user=current_user,
+    )
+    
+
+
+#get the paper document
+@router.get(
+    "/{paper_id}/document",
+    response_model=PaperDocumentResponse,
+)
+def get_document(
+    paper_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    return get_paper_document(
+        db=db,
+        paper_id=paper_id,
         current_user=current_user,
     )
