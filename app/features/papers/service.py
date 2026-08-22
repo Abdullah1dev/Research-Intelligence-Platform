@@ -367,3 +367,35 @@ async def upload_paper_document(
     db.refresh(document)
 
     return document
+
+
+#get document metadata
+def get_paper_document(
+    db: Session,
+    paper_id: int,
+    current_user,
+):
+    paper = db.query(Paper).filter(
+        Paper.id == paper_id,
+        Paper.owner_id == current_user.id
+    ).first()
+
+    if not paper:
+        raise HTTPException(
+            status_code=404,
+            detail="Paper not found"
+        )
+
+    document = (
+        db.query(PaperDocument)
+        .filter(PaperDocument.paper_id == paper_id)
+        .first()
+    )
+
+    if not document:
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found"
+        )
+
+    return document
