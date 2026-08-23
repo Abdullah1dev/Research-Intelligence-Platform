@@ -44,24 +44,29 @@ class LocalStorage:
     
     def delete(self, storage_key: str) -> None:
         file_path = self.get_path(storage_key)
-        
+    
+
+        print("DELETE PATH:", file_path)
+        print("DELETE EXISTS:", file_path.exists())
+
         if file_path.exists():
-                file_path.unlink()
+            file_path.unlink()
         
 
     
 
 
-
-
-
-
     def delete(self, storage_key: str) -> None:
-
-        file_path = Path(storage_key)
+        file_path = self.get_path(storage_key)
+    
+        print("DELETE PATH:", file_path)
+        print("EXISTS:", file_path.exists())
 
         if file_path.exists():
             file_path.unlink()
+            print("DELETED:", file_path)
+        else:
+            print("FILE NOT FOUND:", file_path)
 
     def exists(self, storage_key: str) -> bool:
 

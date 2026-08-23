@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Text , Column
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infrastructure.database.base import Base
@@ -10,6 +10,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from app.features.users.models import User
 
+from enum import Enum as PyEnum
+from sqlalchemy import Enum as SQLEnum
+from app.features.papers.enums import DocumentProcessingStatus
 
 class Paper(Base):
     __tablename__ = "papers"
@@ -141,4 +144,16 @@ class PaperDocument(Base):
     paper = relationship(
         "Paper",
         back_populates="document"
+    )
+    
+    processing_status = Column(
+        SQLEnum(DocumentProcessingStatus),
+        nullable=False,
+        default=DocumentProcessingStatus.PENDING,
+    
+    )
+    
+    processing_error = Column(
+    Text,
+    nullable=True,
     )

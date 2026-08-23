@@ -19,6 +19,9 @@ from app.features.papers.service import (
     get_paper_document,
 )
 
+from app.features.papers.service import delete_paper_document
+from app.features.papers.service import replace_paper_document
+
 
 
 router = APIRouter(
@@ -195,4 +198,35 @@ def download_document(
         path=file_path,
         media_type=document.mime_type,
         filename=document.file_name,
+    )
+    
+#delete actual pdf
+@router.delete(
+    "/{paper_id}/document"
+)
+def delete_document(
+    paper_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    return delete_paper_document(
+        db=db,
+        paper_id=paper_id,
+        current_user=current_user,
+    )
+    
+
+#for replace the existing paper
+@router.put("/{paper_id}/document")
+async def replace_document(
+    paper_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    return await replace_paper_document(
+        db=db,
+        paper_id=paper_id,
+        file=file,
+        current_user=current_user,
     )

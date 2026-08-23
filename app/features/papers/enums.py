@@ -10,3 +10,12 @@ class PaperSortField(str, Enum):
 class SortOrder(str, Enum):
     ASC = "asc"
     DESC = "desc"
+    
+
+
+
+class DocumentProcessingStatus(str, Enum):
+    PENDING = "pending"
+    PROCESSING = "processing"
+    COMPLETED = "completed"
+    FAILED = "failed"

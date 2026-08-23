@@ -1,5 +1,5 @@
-from sqlalchemy.orm import Session
-from sqlalchemy import select , func , or_
+from sqlalchemy.orm import Session 
+from sqlalchemy import select , func , or_  
 
 from app.features.papers.models import Paper
 from app.features.papers.schemas import PaperCreate , PaperUpdate
@@ -9,6 +9,8 @@ from fastapi import HTTPException , UploadFile
 from sqlalchemy.exc import IntegrityError
 from app.infrastructure.storage.local import LocalStorage
 from app.features.papers.models import Paper, PaperDocument
+from datetime import datetime
+
 
 
 
@@ -478,3 +480,65 @@ def delete_paper_document(
     return {
         "message": "Paper document deleted successfully"
     }
+    
+
+
+#replace the existing document
+async def replace_paper_document(
+    db: Session,
+    paper_id: int,
+    file: UploadFile,
+    current_user,
+):
+    paper = (
+        db.query(Paper)
+        .filter(
+            Paper.id == paper_id,
+            Paper.owner_id == current_user.id
+        )
+        .first()
+    )
+
+    if not paper:
+        raise HTTPException(
+            status_code=404,
+            detail="Paper not found"
+        )
+
+    document = (
+        db.query(PaperDocument)
+        .filter(
+            PaperDocument.paper_id == paper_id
+        )
+        .first()
+    )
+
+    if not document:
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found"
+        )
+
+    old_storage_key = document.storage_key
+
+    print("OLD STORAGE KEY:", old_storage_key)
+
+    new_storage_key, new_file_size = await storage.save(
+        file=file,
+        folder=f"papers/{paper_id}"
+    )
+
+    print("NEW STORAGE KEY:", new_storage_key)
+
+    document.file_name = file.filename
+    document.file_size = new_file_size
+    document.mime_type = file.content_type
+    document.storage_key = new_storage_key
+    document.updated_at = datetime.utcnow()
+
+    db.commit()
+    db.refresh(document)
+
+    print("DELETING OLD FILE:", old_storage_key)
+
+    storage.delete(old_storage_key)
