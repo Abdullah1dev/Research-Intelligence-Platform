@@ -147,11 +147,17 @@ class PaperDocument(Base):
     )
     
     processing_status = Column(
-        SQLEnum(DocumentProcessingStatus),
+        SQLEnum(
+            DocumentProcessingStatus,
+            values_callable=lambda enum_class: [member.value for member in enum_class],
+            name="documentprocessingstatus",  
+               
+            ),
         nullable=False,
         default=DocumentProcessingStatus.PENDING,
-    
     )
+   
+    
     
     processing_error = Column(
     Text,

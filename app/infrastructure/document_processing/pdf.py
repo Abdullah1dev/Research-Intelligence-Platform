@@ -1,4 +1,4 @@
-import fitz
+import pymupdf
 from pathlib import Path
 
 
@@ -14,7 +14,7 @@ class PDFExtractor:
 
         text_parts = []
 
-        with fitz.open(path) as document:
+        with pymupdf.open(path) as document:
             for page in document:
                 text_parts.append(page.get_text())
 
