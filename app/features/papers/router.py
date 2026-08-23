@@ -18,6 +18,7 @@ from app.features.papers.service import (
     upload_paper_document,
     get_paper_document,
 )
+from fastapi import BackgroundTasks
 
 from app.features.papers.service import delete_paper_document
 from app.features.papers.service import replace_paper_document
@@ -149,6 +150,7 @@ def delete_single_paper(
 )
 async def upload_document(
     paper_id: int,
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
@@ -158,6 +160,7 @@ async def upload_document(
         paper_id=paper_id,
         file=file,
         current_user=current_user,
+        background_tasks=background_tasks,
     )
     
 
