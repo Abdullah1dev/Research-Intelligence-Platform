@@ -318,7 +318,7 @@ async def upload_paper_document(
     current_user,
     background_tasks: BackgroundTasks,
 ):
-    # 1. Find the paper AND verify ownership
+    # 1. Find paper
     paper = db.query(Paper).filter(
         Paper.id == paper_id,
         Paper.owner_id == current_user.id
@@ -330,7 +330,7 @@ async def upload_paper_document(
             detail="Paper not found"
         )
 
-    # 2. Check whether the paper already has a document
+    # 2. Check existing document
     existing_document = (
         db.query(PaperDocument)
         .filter(PaperDocument.paper_id == paper_id)
@@ -343,20 +343,20 @@ async def upload_paper_document(
             detail="Paper already has a document"
         )
 
-    # 3. Validate file type
+    # 3. Validate PDF
     if file.content_type != "application/pdf":
         raise HTTPException(
             status_code=400,
             detail="Only PDF files are allowed"
         )
 
-    # 4. Save the file
+    # 4. Save PDF
     storage_key, file_size = await storage.save(
         file,
         f"papers/{paper_id}"
     )
 
-    # 5. Create database record
+    # 5. Create document
     document = PaperDocument(
         paper_id=paper_id,
         file_name=file.filename,
@@ -365,7 +365,7 @@ async def upload_paper_document(
         storage_key=storage_key,
     )
 
-    # 6. Save database record
+    # 6. Save document
     db.add(document)
     db.commit()
     db.refresh(document)
@@ -377,6 +377,7 @@ async def upload_paper_document(
     )
 
     return document
+
 
 #get document metadata
 def get_paper_document(

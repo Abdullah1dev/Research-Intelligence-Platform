@@ -19,9 +19,11 @@ class DocumentProcessingService:
         self,
         storage: LocalStorage,
         pdf_extractor: PDFExtractor,
+        chunker: DocumentChunker,
     ):
         self.storage = storage
         self.pdf_extractor = pdf_extractor
+        self.chunker = chunker
 
     def process_document(
         self,
@@ -86,19 +88,24 @@ def process_document_background(document_id: int):
     db = SessionLocal()
 
     try:
-        document = db.query(PaperDocument).filter(
-            PaperDocument.id == document_id
-        ).first()
+        document = (
+            db.query(PaperDocument)
+            .filter(PaperDocument.id == document_id)
+            .first()
+        )
 
         if not document:
+            print(f"Document {document_id} not found")
             return
 
         storage = LocalStorage()
         pdf_extractor = PDFExtractor()
+        chunker = DocumentChunker()
 
         processing_service = DocumentProcessingService(
             storage=storage,
             pdf_extractor=pdf_extractor,
+            chunker=chunker,
         )
 
         processing_service.process_document(
@@ -108,18 +115,3 @@ def process_document_background(document_id: int):
 
     finally:
         db.close()
-        
-
-
-#Chunking part
-class DocumentProcessingService:
-
-    def __init__(
-        self,
-        storage,
-        pdf_extractor,
-        chunker,
-    ):
-        self.storage = storage
-        self.pdf_extractor = pdf_extractor
-        self.chunker = chunker
