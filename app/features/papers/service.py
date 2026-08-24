@@ -12,6 +12,9 @@ from app.features.papers.models import Paper, PaperDocument
 from datetime import datetime
 from app.infrastructure.document_processing.pdf import PDFExtractor
 from app.features.papers.enums import DocumentProcessingStatus
+from fastapi import BackgroundTasks
+from app.infrastructure.database.config import SessionLocal
+from app.features.papers.dependencies import get_document_processing_service
 
 
 
@@ -308,7 +311,27 @@ def delete_paper(
     db.delete(paper)
     db.commit()
 
+#Document Processing background
+def process_document_background(document_id: int):
+    db = SessionLocal()
 
+    try:
+        document = db.query(PaperDocument).filter(
+            PaperDocument.id == document_id
+        ).first()
+
+        if not document:
+            return
+
+        processing_service = get_document_processing_service()
+
+        processing_service.process_document(
+            db=db,
+            document=document,
+        )
+
+    finally:
+        db.close()
 
 #upload paper document function
 async def upload_paper_document(
@@ -316,6 +339,7 @@ async def upload_paper_document(
     paper_id: int,
     file: UploadFile,
     current_user,
+    background_tasks: BackgroundTasks,
 ):
     # 1. Find the paper AND verify ownership
     paper = db.query(Paper).filter(
@@ -369,8 +393,13 @@ async def upload_paper_document(
     db.commit()
     db.refresh(document)
 
-    return document
+    # 7. Schedule background processing
+    background_tasks.add_task(
+        process_document_background,
+        document.id,
+    )
 
+    return document
 
 #get document metadata
 def get_paper_document(
@@ -602,3 +631,26 @@ class DocumentProcessingService:
             db.refresh(document)
 
             raise
+
+
+#Documemt process background
+def process_document_background(document_id: int):
+    db = SessionLocal()
+
+    try:
+        document = db.query(PaperDocument).filter(
+            PaperDocument.id == document_id
+        ).first()
+
+        if not document:
+            return
+
+        processing_service = get_document_processing_service()
+
+        processing_service.process_document(
+            db=db,
+            document=document,
+        )
+
+    finally:
+        db.close()
