@@ -7,6 +7,8 @@ from app.infrastructure.database.config import SessionLocal
 from app.infrastructure.storage.local import LocalStorage
 from app.infrastructure.document_processing.pdf import PDFExtractor
 
+from app.infrastructure.document_processing.chunker import DocumentChunker
+
 
 
 
@@ -42,6 +44,14 @@ class DocumentProcessingService:
             text = self.pdf_extractor.extract_text(
                 str(file_path)
             )
+            chunks = self.chunker.split_text(text)
+
+            print("Extracted characters:", len(text))
+            print("Total chunks:", len(chunks))
+
+            for index, chunk in enumerate(chunks[:3], start=1):
+                print(f"\n--- Chunk {index} ---")
+                print(chunk[:500])
 
             document.processing_status = (
                 DocumentProcessingStatus.COMPLETED
@@ -98,3 +108,18 @@ def process_document_background(document_id: int):
 
     finally:
         db.close()
+        
+
+
+#Chunking part
+class DocumentProcessingService:
+
+    def __init__(
+        self,
+        storage,
+        pdf_extractor,
+        chunker,
+    ):
+        self.storage = storage
+        self.pdf_extractor = pdf_extractor
+        self.chunker = chunker
