@@ -1,5 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict , HttpUrl , Field
+from app.features.papers.enums import DocumentProcessingStatus
 
 
 
@@ -122,6 +123,10 @@ class PaperDocumentResponse(BaseModel):
     file_size: int
     mime_type: str
     storage_key: str
+
+    processing_status: DocumentProcessingStatus
+    processing_error: str | None
+
     created_at: datetime
     updated_at: datetime
 
