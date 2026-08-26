@@ -167,6 +167,15 @@ class PaperDocument(Base):
     nullable=True,
     )
     
+    chunks = relationship(
+        "DocumentChunk",
+        back_populates="document",
+        cascade="all, delete-orphan",
+    )
+    
+    
+    
+#Model for Document Chunking
 class DocumentChunk(Base):
     __tablename__ = "document_chunks"
 
@@ -199,9 +208,15 @@ class DocumentChunk(Base):
         nullable=False,
     )
     
-    chunks = relationship(
-    "DocumentChunk",
-    back_populates="document",
-    cascade="all, delete-orphan",
+    
+    document = relationship(
+    "PaperDocument",
+    back_populates="chunks",
+    
     )
+    
+    
+    
+    
+    
     
