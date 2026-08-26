@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 from enum import Enum as PyEnum
 from sqlalchemy import Enum as SQLEnum
 from app.features.papers.enums import DocumentProcessingStatus
+from pgvector.sqlalchemy import Vector
 
 class Paper(Base):
     __tablename__ = "papers"
@@ -90,6 +91,8 @@ class Paper(Base):
     )
 
 
+
+
 #Paper Document Modle
 class PaperDocument(Base):
     __tablename__ = "paper_documents"
@@ -162,4 +165,36 @@ class PaperDocument(Base):
     processing_error = Column(
     Text,
     nullable=True,
+    )
+    
+class DocumentChunk(Base):
+    __tablename__ = "document_chunks"
+
+    id = Column(Integer, primary_key=True)
+
+    document_id = Column(
+        Integer,
+        ForeignKey("paper_documents.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+
+    chunk_index = Column(
+        Integer,
+        nullable=False,
+    )
+
+    content = Column(
+        Text,
+        nullable=False,
+    )
+
+    embedding = Column(
+        Vector(384),
+        nullable=False,
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False,
     )
