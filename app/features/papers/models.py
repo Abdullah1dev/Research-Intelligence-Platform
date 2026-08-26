@@ -198,3 +198,10 @@ class DocumentChunk(Base):
         default=datetime.utcnow,
         nullable=False,
     )
+    
+    chunks = relationship(
+    "DocumentChunk",
+    back_populates="document",
+    cascade="all, delete-orphan",
+    )
+    
