@@ -10,10 +10,6 @@ class EmbeddingService:
         self.model = SentenceTransformer(model_name)
 
     def embed_text(self, text: str) -> list[float]:
-
-        if not text or not text.strip():
-            return []
-
         embedding = self.model.encode(
             text,
             normalize_embeddings=True,
@@ -25,9 +21,6 @@ class EmbeddingService:
         self,
         texts: list[str],
     ) -> list[list[float]]:
-
-        if not texts:
-            return []
 
         embeddings = self.model.encode(
             texts,
