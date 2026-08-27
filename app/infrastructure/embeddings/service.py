@@ -9,9 +9,25 @@ class EmbeddingService:
     ):
         self.model = SentenceTransformer(model_name)
 
-    def embed_text(self, text: str) -> list[float]:
+    def embed_text(
+        self,
+        text: str,
+    ) -> list[float]:
+
         embedding = self.model.encode(
             text,
+            normalize_embeddings=True,
+        )
+
+        return embedding.tolist()
+
+    def embed_query(
+        self,
+        query: str,
+    ) -> list[float]:
+
+        embedding = self.model.encode(
+            query,
             normalize_embeddings=True,
         )
 
