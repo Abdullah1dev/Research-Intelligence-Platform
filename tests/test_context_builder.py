@@ -2,6 +2,7 @@ from app.infrastructure.database.config import SessionLocal
 from app.infrastructure.embeddings.service import EmbeddingService
 from app.infrastructure.vector_search.service import VectorSearchService
 from app.infrastructure.rag.context_builder import RAGContextBuilder
+from app.features.users.models import User
 
 
 db = SessionLocal()
