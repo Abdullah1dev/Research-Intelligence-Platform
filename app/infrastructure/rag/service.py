@@ -22,7 +22,7 @@ class RAGService:
         db: Session,
         document_id: int,
         question: str,
-        limit: int = 5,
+        top_k: int = 4,
     ) -> str:
 
         # 1. Retrieve relevant chunks
@@ -30,7 +30,7 @@ class RAGService:
             db=db,
             document_id=document_id,
             query=question,
-            limit=limit,
+            top_k=4,
         )
 
         # 2. Build context
