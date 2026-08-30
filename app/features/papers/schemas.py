@@ -136,6 +136,7 @@ class PaperDocumentResponse(BaseModel):
     
 
 class PaperQuestionRequest(BaseModel):
+
     question: str = Field(
         ...,
         min_length=1,
@@ -144,15 +145,24 @@ class PaperQuestionRequest(BaseModel):
 
 
 class PaperSourceResponse(BaseModel):
+
+    chunk_id: int
+
     chunk_index: int
+
     content: str
-    
-    
-    
+
+    similarity_score: float
+
+
 class PaperQuestionResponse(BaseModel):
+
     paper_id: int
+
     document_id: int
+
     question: str
+
     answer: str
+
     sources: list[PaperSourceResponse]
-    
