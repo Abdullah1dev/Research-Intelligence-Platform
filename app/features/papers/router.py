@@ -22,8 +22,11 @@ from fastapi import BackgroundTasks
 
 from app.features.papers.service import delete_paper_document
 from app.features.papers.service import replace_paper_document
-
-
+from app.features.papers.schemas import (
+    PaperQuestionRequest,
+    PaperQuestionResponse,
+)
+from app.features.papers.service import ask_paper
 
 router = APIRouter(
     prefix="/papers",
@@ -104,7 +107,7 @@ def get_single_paper(
     )
     
     
-
+#update paper document
 @router.put(
     "/{paper_id}",
     response_model=PaperResponse,
@@ -231,5 +234,23 @@ async def replace_document(
         db=db,
         paper_id=paper_id,
         file=file,
+        current_user=current_user,
+    )
+
+#For paper Question Answering
+@router.post(
+    "/{paper_id}/ask",
+    response_model=PaperQuestionResponse,
+)
+def ask_paper_question(
+    paper_id: int,
+    request: PaperQuestionRequest,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    return ask_paper(
+        db=db,
+        paper_id=paper_id,
+        question=request.question,
         current_user=current_user,
     )
