@@ -602,22 +602,31 @@ def ask_paper(
                 f"Current status: {document.processing_status}"
             ),
         )
-        
 
     # 4. Get shared RAG service
     rag_service = get_rag_service()
 
     # 5. Ask the RAG pipeline
-    answer = rag_service.ask(
+    rag_result = rag_service.ask(
         db=db,
         document_id=document.id,
         question=question,
     )
 
-    # 6. Return structured data
+    # 6. Format retrieved chunks as sources
+    sources = [
+        {
+            "chunk_index": chunk.chunk_index,
+            "content": chunk.content,
+        }
+        for chunk in rag_result["chunks"]
+    ]
+
+    # 7. Return structured data
     return {
         "paper_id": paper.id,
         "document_id": document.id,
         "question": question,
-        "answer": answer,
+        "answer": rag_result["answer"],
+        "sources": sources,
     }
