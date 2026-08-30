@@ -25,29 +25,30 @@ class RAGService:
         top_k: int = 4,
     ) -> dict:
 
-        # 1. Retrieve relevant chunks
-        chunks = self.vector_search_service.search(
+        # 1. Retrieve relevant chunks with similarity scores
+        results = self.vector_search_service.search(
             db=db,
             document_id=document_id,
             query=question,
             top_k=top_k,
         )
 
-        # 2. Build context
+        # 2. Build context from retrieved results
         context = self.context_builder.build_context(
-            chunks
+            results
         )
 
+        # 3. If no relevant context was found
         if not context:
             return {
                 "answer": (
                     "I could not find relevant information "
                     "in this document."
                 ),
-                "chunks": [],
+                "results": [],
             }
 
-        # 3. Build RAG prompt
+        # 4. Build RAG prompt
         prompt = f"""
 You are a research paper assistant.
 
@@ -68,13 +69,13 @@ Question:
 Answer:
 """
 
-        # 4. Generate answer
+        # 5. Generate answer
         answer = self.llm_service.generate(
             prompt
         )
 
-        # 5. Return answer and retrieved chunks
+        # 6. Return answer + retrieval results
         return {
             "answer": answer,
-            "chunks": chunks,
+            "results": results,
         }
