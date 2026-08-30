@@ -131,3 +131,20 @@ class PaperDocumentResponse(BaseModel):
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+    
+    
+    
+
+class PaperQuestionRequest(BaseModel):
+    question: str = Field(
+        ...,
+        min_length=1,
+        description="Question to ask about the paper",
+    )
+
+
+class PaperQuestionResponse(BaseModel):
+    paper_id: int
+    document_id: int
+    question: str
+    answer: str
