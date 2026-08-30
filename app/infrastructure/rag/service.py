@@ -23,14 +23,14 @@ class RAGService:
         document_id: int,
         question: str,
         top_k: int = 4,
-    ) -> str:
+    ) -> dict:
 
         # 1. Retrieve relevant chunks
         chunks = self.vector_search_service.search(
             db=db,
             document_id=document_id,
             query=question,
-            top_k=4,
+            top_k=top_k,
         )
 
         # 2. Build context
@@ -39,7 +39,13 @@ class RAGService:
         )
 
         if not context:
-            return "I could not find relevant information in this document."
+            return {
+                "answer": (
+                    "I could not find relevant information "
+                    "in this document."
+                ),
+                "chunks": [],
+            }
 
         # 3. Build RAG prompt
         prompt = f"""
@@ -67,4 +73,8 @@ Answer:
             prompt
         )
 
-        return answer
+        # 5. Return answer and retrieved chunks
+        return {
+            "answer": answer,
+            "chunks": chunks,
+        }
