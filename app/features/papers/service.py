@@ -552,6 +552,8 @@ async def replace_paper_document(
     storage.delete(old_storage_key)
     
 
+
+
 #Function for RAG Docuemnt Answers  Questions
 def ask_paper(
     db: Session,
@@ -613,16 +615,22 @@ def ask_paper(
         question=question,
     )
 
-    # 6. Format retrieved chunks as sources
+    # 6. Format retrieval results as API sources
     sources = [
         {
+            "chunk_id": chunk.id,
             "chunk_index": chunk.chunk_index,
             "content": chunk.content,
+            "similarity_score": round(
+                similarity_score,
+                4,
+            ),
         }
-        for chunk in rag_result["chunks"]
+        for chunk, similarity_score
+        in rag_result["results"]
     ]
 
-    # 7. Return structured data
+    # 7. Return structured response
     return {
         "paper_id": paper.id,
         "document_id": document.id,
