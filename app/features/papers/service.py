@@ -12,7 +12,12 @@ from app.features.papers.models import Paper, PaperDocument
 from datetime import datetime
 from fastapi import BackgroundTasks
 from app.features.papers.processing_service import process_document_background
-
+from app.infrastructure.embeddings.service import EmbeddingService
+from app.infrastructure.vector_search.service import VectorSearchService
+from app.infrastructure.rag.context_builder import RAGContextBuilder
+from app.infrastructure.rag.service import RAGService
+from app.infrastructure.llm.service import LLMService
+from app.features.papers.enums import DocumentProcessingStatus
 
 
 storage = LocalStorage()
@@ -552,4 +557,85 @@ async def replace_paper_document(
     storage.delete(old_storage_key)
     
 
+#Function for RAG Docuemnt Answers  Questions
+def ask_paper(
+    db: Session,
+    paper_id: int,
+    question: str,
+    current_user,
+):
+    # 1. Find the paper and verify ownership
+    paper = (
+        db.query(Paper)
+        .filter(
+            Paper.id == paper_id,
+            Paper.owner_id == current_user.id,
+        )
+        .first()
+    )
 
+    if not paper:
+        raise HTTPException(
+            status_code=404,
+            detail="Paper not found",
+        )
+
+    # 2. Find the paper's document
+    document = (
+        db.query(PaperDocument)
+        .filter(
+            PaperDocument.paper_id == paper.id,
+        )
+        .first()
+    )
+
+    if not document:
+        raise HTTPException(
+            status_code=404,
+            detail="No document found for this paper",
+        )
+
+    # 3. Make sure processing is completed
+    if (
+        document.processing_status
+        != DocumentProcessingStatus.COMPLETED
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Document is not ready yet. "
+                f"Current status: {document.processing_status}"
+            ),
+        )
+
+    # 4. Initialize RAG dependencies
+    embedding_service = EmbeddingService()
+
+    vector_search_service = VectorSearchService(
+        embedding_service=embedding_service,
+    )
+
+    context_builder = RAGContextBuilder()
+
+    llm_service = LLMService()
+
+    rag_service = RAGService(
+        vector_search_service=vector_search_service,
+        context_builder=context_builder,
+        llm_service=llm_service,
+    )
+
+    # 5. Ask the RAG pipeline
+    answer = rag_service.ask(
+        db=db,
+        document_id=document.id,
+        question=question,
+    )
+
+    # 6. Return structured data
+    return {
+        "paper_id": paper.id,
+        "document_id": document.id,
+        "question": question,
+        "answer": answer,
+    }
