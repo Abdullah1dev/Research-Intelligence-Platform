@@ -15,6 +15,7 @@ class VectorSearchService:
     def search(
         self,
         db: Session,
+        document_id: int,
         query: str,
         top_k: int = 4,
     ) -> list[DocumentChunk]:
@@ -28,6 +29,9 @@ class VectorSearchService:
 
         chunks = (
             db.query(DocumentChunk)
+            .filter(
+                DocumentChunk.document_id == document_id
+            )
             .order_by(
                 DocumentChunk.embedding.cosine_distance(
                     query_embedding

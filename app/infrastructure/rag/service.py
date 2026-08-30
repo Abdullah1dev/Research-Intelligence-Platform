@@ -1,43 +1,70 @@
 from sqlalchemy.orm import Session
 
-from app.infrastructure.embeddings.service import EmbeddingService
 from app.infrastructure.vector_search.service import VectorSearchService
 from app.infrastructure.rag.context_builder import RAGContextBuilder
+from app.infrastructure.llm.service import LLMService
 
 
 class RAGService:
 
     def __init__(
         self,
-        embedding_service: EmbeddingService,
         vector_search_service: VectorSearchService,
         context_builder: RAGContextBuilder,
+        llm_service: LLMService,
     ):
-        self.embedding_service = embedding_service
         self.vector_search_service = vector_search_service
         self.context_builder = context_builder
+        self.llm_service = llm_service
 
-    def retrieve_context(
+    def ask(
         self,
         db: Session,
         document_id: int,
-        query: str,
+        question: str,
         limit: int = 5,
     ) -> str:
 
-        query_embedding = self.embedding_service.embed_text(
-            query
-        )
-
+        # 1. Retrieve relevant chunks
         chunks = self.vector_search_service.search(
             db=db,
             document_id=document_id,
-            query_embedding=query_embedding,
+            query=question,
             limit=limit,
         )
 
+        # 2. Build context
         context = self.context_builder.build_context(
             chunks
         )
 
-        return context
+        if not context:
+            return "I could not find relevant information in this document."
+
+        # 3. Build RAG prompt
+        prompt = f"""
+You are a research paper assistant.
+
+Answer the user's question using ONLY the provided context.
+
+If the answer is not available in the context, say:
+
+"I could not find the answer in the provided document."
+
+Do not make up information.
+
+Context:
+{context}
+
+Question:
+{question}
+
+Answer:
+"""
+
+        # 4. Generate answer
+        answer = self.llm_service.generate(
+            prompt
+        )
+
+        return answer
