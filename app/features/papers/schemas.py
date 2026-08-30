@@ -143,8 +143,16 @@ class PaperQuestionRequest(BaseModel):
     )
 
 
+class PaperSourceResponse(BaseModel):
+    chunk_index: int
+    content: str
+    
+    
+    
 class PaperQuestionResponse(BaseModel):
     paper_id: int
     document_id: int
     question: str
     answer: str
+    sources: list[PaperSourceResponse]
+    
