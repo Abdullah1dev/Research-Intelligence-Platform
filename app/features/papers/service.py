@@ -24,7 +24,7 @@ from app.features.papers.models import (
 )
 
 from app.infrastructure.llm.service import LLMService
-
+from app.infrastructure.analysis.service import AnalysisService
 
 storage = LocalStorage()
 
@@ -674,7 +674,7 @@ def summarize_paper(
             status_code=404,
             detail="No document found for this paper",
         )
-
+ 
     # 3. Make sure processing is completed
     if (
         document.processing_status
@@ -729,4 +729,100 @@ def summarize_paper(
         "paper_id": paper.id,
         "document_id": document.id,
         "summary": summary,
+    }
+    
+
+
+
+#Analyze Paper
+def analyze_paper(
+    db: Session,
+    paper_id: int,
+    current_user,
+):
+    # 1. Find paper and verify ownership
+    paper = (
+        db.query(Paper)
+        .filter(
+            Paper.id == paper_id,
+            Paper.owner_id == current_user.id,
+        )
+        .first()
+    )
+
+    if not paper:
+        raise HTTPException(
+            status_code=404,
+            detail="Paper not found",
+        )
+
+    # 2. Find the paper document
+    document = (
+        db.query(PaperDocument)
+        .filter(
+            PaperDocument.paper_id == paper.id,
+        )
+        .first()
+    )
+
+    if not document:
+        raise HTTPException(
+            status_code=404,
+            detail="No document found for this paper",
+        )
+
+    # 3. Check processing status
+    if (
+        document.processing_status
+        != DocumentProcessingStatus.COMPLETED
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Document is not ready yet. "
+                f"Current status: {document.processing_status}"
+            ),
+        )
+
+    # 4. Get chunks in original document order
+    chunks = (
+        db.query(DocumentChunk)
+        .filter(
+            DocumentChunk.document_id == document.id
+        )
+        .order_by(
+            DocumentChunk.chunk_index
+        )
+        .all()
+    )
+
+    if not chunks:
+        raise HTTPException(
+            status_code=404,
+            detail="No processed chunks found for this document",
+        )
+
+    # 5. Combine document content
+    document_text = "\n\n".join(
+        chunk.content
+        for chunk in chunks
+    )
+
+    # 6. Create AI analysis service
+    llm_service = LLMService()
+
+    analysis_service = AnalysisService(
+        llm_service=llm_service,
+    )
+
+    # 7. Analyze document
+    analysis = analysis_service.analyze(
+        document_text
+    )
+
+    # 8. Return structured response
+    return {
+        "paper_id": paper.id,
+        "document_id": document.id,
+        "analysis": analysis,
     }
