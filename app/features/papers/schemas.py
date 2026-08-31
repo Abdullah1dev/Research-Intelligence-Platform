@@ -179,3 +179,27 @@ class PaperSummaryResponse(BaseModel):
     document_id: int
 
     summary: str
+    
+
+class PaperAnalysisData(BaseModel):
+
+    research_domain: str
+
+    key_topics: list[str]
+
+    methodology: str
+
+    key_findings: list[str]
+
+    limitations: str
+
+    future_work: str
+
+
+class PaperAnalysisResponse(BaseModel):
+
+    paper_id: int
+
+    document_id: int
+
+    analysis: PaperAnalysisData
