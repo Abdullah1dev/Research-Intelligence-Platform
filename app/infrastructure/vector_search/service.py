@@ -19,12 +19,12 @@ class VectorSearchService:
         query: str,
         top_k: int = 4,
         similarity_threshold: float = 0.5,
-    ) -> list[tuple[DocumentChunk, float]]:
+    ) -> list[dict]:
 
         if not query or not query.strip():
             return []
 
-        # 1. Generate embedding for the query
+        # 1. Generate embedding for the user's query
         query_embedding = (
             self.embedding_service.embed_query(query)
         )
@@ -36,7 +36,7 @@ class VectorSearchService:
             )
         )
 
-        # 3. Search chunks and retrieve distance
+        # 3. Search the most relevant chunks
         results = (
             db.query(
                 DocumentChunk,
@@ -50,17 +50,26 @@ class VectorSearchService:
             .all()
         )
 
-        relevant_results = []
+        sources = []
 
         # 4. Convert distance to similarity
-        for chunk, distance_value in results:
+        for chunk, cosine_distance in results:
 
-            similarity_score = 1 - distance_value
+            similarity_score = (
+                1 - float(cosine_distance)
+            )
 
-            # 5. Apply relevance threshold
+            # 5. Apply similarity threshold
             if similarity_score >= similarity_threshold:
-                relevant_results.append(
-                    (chunk, similarity_score)
+
+                sources.append(
+                    {
+                        "chunk": chunk,
+                        "similarity_score": round(
+                            similarity_score,
+                            4,
+                        ),
+                    }
                 )
 
-        return relevant_results
+        return sources
