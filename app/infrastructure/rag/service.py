@@ -23,32 +23,49 @@ class RAGService:
         document_id: int,
         question: str,
         top_k: int = 4,
+        similarity_threshold: float = 0.5,
     ) -> dict:
 
-        # 1. Retrieve relevant chunks with similarity scores
-        results = self.vector_search_service.search(
+        # 1. Search for relevant chunks
+        search_results = self.vector_search_service.search(
             db=db,
             document_id=document_id,
             query=question,
             top_k=top_k,
+            similarity_threshold=similarity_threshold,
         )
 
-        # 2. Build context from retrieved results
+        # 2. Stop if no sufficiently relevant chunks exist
+        if not search_results:
+            return {
+                "answer": (
+                    "I could not find relevant information "
+                    "in this document."
+                ),
+                "sources": [],
+            }
+
+        # 3. Extract chunks for the context builder
+        chunks = [
+            result["chunk"]
+            for result in search_results
+        ]
+
+        # 4. Build context
         context = self.context_builder.build_context(
-            results
+            chunks
         )
 
-        # 3. If no relevant context was found
         if not context:
             return {
                 "answer": (
                     "I could not find relevant information "
                     "in this document."
                 ),
-                "results": [],
+                "sources": [],
             }
 
-        # 4. Build RAG prompt
+        # 5. Build the RAG prompt
         prompt = f"""
 You are a research paper assistant.
 
@@ -69,13 +86,31 @@ Question:
 Answer:
 """
 
-        # 5. Generate answer
+        # 6. Generate answer
         answer = self.llm_service.generate(
             prompt
         )
 
-        # 6. Return answer + retrieval results
+        # 7. Prepare source information
+        sources = []
+
+        for result in search_results:
+
+            chunk = result["chunk"]
+
+            sources.append(
+                {
+                    "chunk_id": chunk.id,
+                    "chunk_index": chunk.chunk_index,
+                    "content": chunk.content,
+                    "similarity_score": (
+                        result["similarity_score"]
+                    ),
+                }
+            )
+
+        # 8. Return answer and sources
         return {
             "answer": answer,
-            "results": results,
+            "sources": sources,
         }
