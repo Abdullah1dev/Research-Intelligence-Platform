@@ -14,6 +14,17 @@ from fastapi import BackgroundTasks
 from app.features.papers.processing_service import process_document_background
 from app.features.papers.enums import DocumentProcessingStatus
 from app.infrastructure.rag.dependencies import get_rag_service
+from app.infrastructure.summarization.service import (
+    SummarizationService,
+)
+from app.features.papers.models import (
+    Paper,
+    PaperDocument,
+    DocumentChunk,
+)
+
+from app.infrastructure.llm.service import LLMService
+
 
 storage = LocalStorage()
 
@@ -622,4 +633,100 @@ def ask_paper(
         "question": question,
         "answer": rag_result["answer"],
         "sources": rag_result["sources"],
+    }
+
+
+
+
+#Summarize Paper
+def summarize_paper(
+    db: Session,
+    paper_id: int,
+    current_user,
+):
+    # 1. Find the paper and verify ownership
+    paper = (
+        db.query(Paper)
+        .filter(
+            Paper.id == paper_id,
+            Paper.owner_id == current_user.id,
+        )
+        .first()
+    )
+
+    if not paper:
+        raise HTTPException(
+            status_code=404,
+            detail="Paper not found",
+        )
+
+    # 2. Find the paper's document
+    document = (
+        db.query(PaperDocument)
+        .filter(
+            PaperDocument.paper_id == paper.id,
+        )
+        .first()
+    )
+
+    if not document:
+        raise HTTPException(
+            status_code=404,
+            detail="No document found for this paper",
+        )
+
+    # 3. Make sure processing is completed
+    if (
+        document.processing_status
+        != DocumentProcessingStatus.COMPLETED
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Document is not ready yet. "
+                f"Current status: {document.processing_status}"
+            ),
+        )
+
+    # 4. Get all document chunks in correct order
+    chunks = (
+        db.query(DocumentChunk)
+        .filter(
+            DocumentChunk.document_id == document.id
+        )
+        .order_by(
+            DocumentChunk.chunk_index
+        )
+        .all()
+    )
+
+    if not chunks:
+        raise HTTPException(
+            status_code=404,
+            detail="No processed chunks found for this document",
+        )
+
+    # 5. Combine chunk content
+    document_text = "\n\n".join(
+        chunk.content
+        for chunk in chunks
+    )
+
+    # 6. Create summarization services
+    llm_service = LLMService()
+
+    summarization_service = SummarizationService(
+        llm_service=llm_service,
+    )
+
+    # 7. Generate summary
+    summary = summarization_service.summarize(
+        document_text
+    )
+
+    # 8. Return result
+    return {
+        "paper_id": paper.id,
+        "document_id": document.id,
+        "summary": summary,
     }
