@@ -5,23 +5,19 @@ class RAGContextBuilder:
 
     def build_context(
         self,
-        results: list[tuple[DocumentChunk, float]],
+        chunks,
     ) -> str:
 
-        if not results:
+        if not chunks:
             return ""
 
         context_parts = []
 
-        for chunk, similarity_score in results:
+        for chunk in chunks:
 
             context_parts.append(
-                f"""
-Source Chunk {chunk.chunk_index}
-
-Content:
-{chunk.content}
-"""
+                f"[Chunk {chunk.chunk_index}]\n"
+                f"{chunk.content}"
             )
 
         return "\n\n".join(context_parts)
