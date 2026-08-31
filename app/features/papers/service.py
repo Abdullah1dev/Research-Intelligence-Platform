@@ -615,26 +615,11 @@ def ask_paper(
         question=question,
     )
 
-    # 6. Format retrieval results as API sources
-    sources = [
-        {
-            "chunk_id": chunk.id,
-            "chunk_index": chunk.chunk_index,
-            "content": chunk.content,
-            "similarity_score": round(
-                similarity_score,
-                4,
-            ),
-        }
-        for chunk, similarity_score
-        in rag_result["results"]
-    ]
-
-    # 7. Return structured response
+    # 6. Return structured response
     return {
         "paper_id": paper.id,
         "document_id": document.id,
         "question": question,
         "answer": rag_result["answer"],
-        "sources": sources,
+        "sources": rag_result["sources"],
     }
