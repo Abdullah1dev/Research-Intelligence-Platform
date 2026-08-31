@@ -28,6 +28,15 @@ from app.features.papers.schemas import (
 )
 from app.features.papers.service import ask_paper
 
+from app.features.papers.schemas import (
+    PaperSummaryResponse,
+)
+from app.features.papers.service import (
+    summarize_paper,
+)
+
+
+
 router = APIRouter(
     prefix="/papers",
     tags=["Papers"],
@@ -252,5 +261,23 @@ def ask_paper_question(
         db=db,
         paper_id=paper_id,
         question=request.question,
+        current_user=current_user,
+    )
+
+
+#endpoint for paper summary response
+@router.post(
+    "/{paper_id}/summarize",
+    response_model=PaperSummaryResponse,
+)
+def summarize_paper_endpoint(
+    paper_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+
+    return summarize_paper(
+        db=db,
+        paper_id=paper_id,
         current_user=current_user,
     )
