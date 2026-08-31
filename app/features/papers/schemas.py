@@ -142,6 +142,9 @@ class PaperQuestionRequest(BaseModel):
         min_length=1,
         description="Question to ask about the paper",
     )
+    
+    
+    
 
 
 class PaperSourceResponse(BaseModel):
@@ -166,3 +169,13 @@ class PaperQuestionResponse(BaseModel):
     answer: str
 
     sources: list[PaperSourceResponse]
+    
+
+#Paper Summary Response
+class PaperSummaryResponse(BaseModel):
+
+    paper_id: int
+
+    document_id: int
+
+    summary: str
