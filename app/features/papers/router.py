@@ -35,6 +35,14 @@ from app.features.papers.service import (
     summarize_paper,
 )
 
+from app.features.papers.schemas import (
+    PaperAnalysisResponse,
+)
+
+
+from app.features.papers.service import (
+    analyze_paper,
+)
 
 
 router = APIRouter(
@@ -265,6 +273,7 @@ def ask_paper_question(
     )
 
 
+
 #endpoint for paper summary response
 @router.post(
     "/{paper_id}/summarize",
@@ -277,6 +286,23 @@ def summarize_paper_endpoint(
 ):
 
     return summarize_paper(
+        db=db,
+        paper_id=paper_id,
+        current_user=current_user,
+    )
+
+#Analyze Paper endpoint
+@router.post(
+    "/{paper_id}/analyze",
+    response_model=PaperAnalysisResponse,
+)
+def analyze_paper_endpoint(
+    paper_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+
+    return analyze_paper(
         db=db,
         paper_id=paper_id,
         current_user=current_user,
