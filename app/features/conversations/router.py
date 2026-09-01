@@ -86,3 +86,26 @@ def get_conversation_endpoint(
         conversation_id=conversation_id,
         current_user=current_user,
     )
+
+
+
+# Delete conversation
+@router.delete(
+    "/{conversation_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_conversation_endpoint(
+    conversation_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+
+    delete_conversation(
+        db=db,
+        conversation_id=conversation_id,
+        current_user=current_user,
+    )
+
+    return Response(
+        status_code=status.HTTP_204_NO_CONTENT,
+    )
