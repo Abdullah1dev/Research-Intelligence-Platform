@@ -49,3 +49,21 @@ def create_conversation_endpoint(
         conversation_data=conversation_data,
         current_user=current_user,
     )
+    
+
+
+
+# Get all conversations
+@router.get(
+    "/",
+    response_model=list[ConversationResponse],
+)
+def get_conversations_endpoint(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+
+    return get_conversations(
+        db=db,
+        current_user=current_user,
+    )
