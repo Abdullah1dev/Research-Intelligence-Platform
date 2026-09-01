@@ -67,3 +67,29 @@ def get_conversations(
     )
 
     return conversations
+
+
+
+#Get specfic conversation
+def get_conversation(
+    db: Session,
+    conversation_id: int,
+    current_user,
+) -> Conversation:
+
+    conversation = (
+        db.query(Conversation)
+        .filter(
+            Conversation.id == conversation_id,
+            Conversation.user_id == current_user.id,
+        )
+        .first()
+    )
+
+    if not conversation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Conversation not found",
+        )
+
+    return conversation
