@@ -93,3 +93,32 @@ def get_conversation(
         )
 
     return conversation
+
+
+
+
+#Delete conversation
+def delete_conversation(
+    db: Session,
+    conversation_id: int,
+    current_user,
+) -> None:
+
+    conversation = (
+        db.query(Conversation)
+        .filter(
+            Conversation.id == conversation_id,
+            Conversation.user_id == current_user.id,
+        )
+        .first()
+    )
+
+    if not conversation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Conversation not found",
+        )
+
+    db.delete(conversation)
+
+    db.commit()
