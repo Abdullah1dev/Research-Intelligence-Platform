@@ -67,3 +67,22 @@ def get_conversations_endpoint(
         db=db,
         current_user=current_user,
     )
+
+
+
+# Get a specific conversation
+@router.get(
+    "/{conversation_id}",
+    response_model=ConversationResponse,
+)
+def get_conversation_endpoint(
+    conversation_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+
+    return get_conversation(
+        db=db,
+        conversation_id=conversation_id,
+        current_user=current_user,
+    )
