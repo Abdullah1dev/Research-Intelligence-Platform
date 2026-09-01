@@ -7,7 +7,7 @@ from app.features.conversations.schemas import ConversationCreate
 
 from app.features.papers.models import Paper
 
-
+#Create Conversation
 def create_conversation(
     db: Session,
     conversation_data: ConversationCreate,
@@ -46,4 +46,24 @@ def create_conversation(
     # 4. Refresh object
     db.refresh(conversation)
 
-    return conversation
+    return conversation 
+
+
+#Get all conversation
+def get_conversations(
+    db: Session,
+    current_user,
+) -> list[Conversation]:
+
+    conversations = (
+        db.query(Conversation)
+        .filter(
+            Conversation.user_id == current_user.id,
+        )
+        .order_by(
+            Conversation.updated_at.desc(),
+        )
+        .all()
+    )
+
+    return conversations
