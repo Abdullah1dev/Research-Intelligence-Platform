@@ -215,6 +215,11 @@ class DocumentChunk(Base):
     
     )
     
+    conversations = relationship(
+    "Conversation",
+    back_populates="paper",
+    )
+    
     
     
     

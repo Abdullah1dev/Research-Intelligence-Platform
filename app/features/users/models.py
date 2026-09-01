@@ -62,3 +62,10 @@ class User(Base):
     papers: Mapped[list["Paper"]] = relationship(
         back_populates="owner"
     )
+    
+    
+    conversations = relationship(
+    "Conversation",
+    back_populates="user",
+    )
+    
