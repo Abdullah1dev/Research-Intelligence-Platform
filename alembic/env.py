@@ -6,6 +6,7 @@ from app.infrastructure.database.base import Base
 from app.infrastructure.database.config import engine
 from app.features.users.models import User
 from app.features.papers.models import Paper
+from app.features.conversations.models import Conversation
 
 
 # this is the Alembic Config object, which provides
