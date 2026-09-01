@@ -9,7 +9,7 @@ from fastapi import (
 
 from sqlalchemy.orm import Session
 
-from app.infrastructure.database.dependencies import get_db
+from app.infrastructure.database.config import get_db
 
 from app.features.auth.dependencies import get_current_user
 
