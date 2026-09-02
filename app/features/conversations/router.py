@@ -5,7 +5,9 @@ from fastapi import (
     Depends,
     Response,
     status,
+     Request,
 )
+
 
 from sqlalchemy.orm import Session
 
@@ -24,6 +26,18 @@ from app.features.conversations.service import (
     get_conversation,
     delete_conversation,
 )
+
+from app.features.conversations.schemas import (
+    ConversationMessageRequest,
+    ConversationMessageResponse,
+)
+
+from app.features.conversations.service import (
+    send_message,
+)
+
+
+
 
 
 router = APIRouter(
@@ -108,4 +122,42 @@ def delete_conversation_endpoint(
 
     return Response(
         status_code=status.HTTP_204_NO_CONTENT,
+    )
+    
+
+@router.post(
+    "/{conversation_id}/messages",
+    response_model=ConversationMessageResponse,
+)
+def send_conversation_message(
+
+    conversation_id: int,
+
+    request_body: ConversationMessageRequest,
+
+    request: Request,
+
+    db: Session = Depends(get_db),
+
+    current_user=Depends(get_current_user),
+
+):
+
+    # Get the already initialized Research Agent
+    research_agent = (
+        request.app.state.research_agent
+    )
+
+    return send_message(
+
+        db=db,
+
+        conversation_id=conversation_id,
+
+        message=request_body.message,
+
+        current_user=current_user,
+
+        research_agent=research_agent,
+
     )
