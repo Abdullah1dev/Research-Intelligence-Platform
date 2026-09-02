@@ -183,7 +183,10 @@ class DocumentChunk(Base):
 
     document_id = Column(
         Integer,
-        ForeignKey("paper_documents.id", ondelete="CASCADE"),
+        ForeignKey(
+            "paper_documents.id",
+            ondelete="CASCADE",
+        ),
         nullable=False,
     )
 
@@ -207,21 +210,8 @@ class DocumentChunk(Base):
         default=datetime.utcnow,
         nullable=False,
     )
-    
-    
+
     document = relationship(
-    "PaperDocument",
-    back_populates="chunks",
-    
+        "PaperDocument",
+        back_populates="chunks",
     )
-    
-    conversations = relationship(
-    "Conversation",
-    back_populates="paper",
-    )
-    
-    
-    
-    
-    
-    
