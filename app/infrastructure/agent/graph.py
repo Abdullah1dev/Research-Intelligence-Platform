@@ -23,35 +23,28 @@ def research_assistant_node(
     state: ResearchAgentState,
 ):
 
-    # Send conversation messages to the LLM
     response = llm.invoke(
         state["messages"]
     )
 
-    # Return the new AI message
     return {
-        "messages": [
-            AIMessage(
-                content=response.content
-            )
-        ]
+        "messages": [response]
     }
 
 
-def build_research_agent():
+def build_research_agent(
+    checkpointer,
+):
 
-    # Create graph
     graph = StateGraph(
         ResearchAgentState
     )
 
-    # Add node
     graph.add_node(
         "research_assistant",
         research_assistant_node,
     )
 
-    # Define graph flow
     graph.add_edge(
         START,
         "research_assistant",
@@ -62,4 +55,6 @@ def build_research_agent():
         END,
     )
 
-    return graph
+    return graph.compile(
+        checkpointer=checkpointer,
+    )
