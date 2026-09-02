@@ -89,6 +89,12 @@ class Paper(Base):
     uselist=False,
     cascade="all, delete-orphan"
     )
+    
+    conversations = relationship(
+    "Conversation",
+    back_populates="paper",
+    cascade="all, delete-orphan",
+    )
 
 
 

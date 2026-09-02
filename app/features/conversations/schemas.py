@@ -34,3 +34,20 @@ class ConversationResponse(BaseModel):
     model_config = ConfigDict(
         from_attributes=True,
     )
+    
+
+class ConversationChatRequest(BaseModel):
+
+    message: str = Field(
+        ...,
+        min_length=1,
+        description="Message sent by the user",
+    )
+
+
+
+class ConversationChatResponse(BaseModel):
+
+    conversation_id: int
+
+    answer: str
