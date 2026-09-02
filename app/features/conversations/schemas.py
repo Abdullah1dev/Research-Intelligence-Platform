@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field
 
 
 class ConversationCreate(BaseModel):
@@ -49,5 +50,25 @@ class ConversationChatRequest(BaseModel):
 class ConversationChatResponse(BaseModel):
 
     conversation_id: int
+
+    answer: str
+    
+    
+
+class ConversationMessageRequest(BaseModel):
+
+    message: str = Field(
+        ...,
+        min_length=1,
+        max_length=5000,
+        description="User message sent to the research assistant",
+    )
+    
+
+class ConversationMessageResponse(BaseModel):
+
+    conversation_id: int
+
+    paper_id: int
 
     answer: str
