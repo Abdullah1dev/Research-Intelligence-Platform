@@ -9,6 +9,11 @@ from app.features.papers.models import Paper
 from langchain_core.messages import HumanMessage
 from sqlalchemy import func
 
+from app.infrastructure.agent.context import (
+    ResearchAgentContext,
+)
+
+
 
 
 #Create Conversation
@@ -127,9 +132,9 @@ def delete_conversation(
 
     db.commit()
     
-    
 
 
+#Send message to agent
 def send_message(
     db: Session,
     conversation_id: int,
@@ -138,7 +143,7 @@ def send_message(
     research_agent,
 ):
 
-    # 1. Find the conversation
+    # 1. Find conversation and verify ownership
     conversation = (
         db.query(Conversation)
         .filter(
@@ -148,53 +153,47 @@ def send_message(
         .first()
     )
 
-    # 2. Verify ownership
     if not conversation:
-
         raise HTTPException(
             status_code=404,
             detail="Conversation not found",
         )
 
-    # 3. Create a unique LangGraph thread ID
-    thread_id = (
-        f"conversation_{conversation.id}"
-    )
+    # 2. Create stable LangGraph thread ID
+    thread_id = f"conversation_{conversation.id}"
 
-    # 4. LangGraph configuration
     config = {
         "configurable": {
             "thread_id": thread_id,
         }
     }
 
-    # 5. Invoke the Research Agent
+    # 3. Run research agent
     result = research_agent.invoke(
         {
             "messages": [
-                HumanMessage(
-                    content=message
-                )
+                HumanMessage(content=message)
             ],
             "conversation_id": conversation.id,
             "user_id": current_user.id,
             "paper_id": conversation.paper_id,
         },
         config=config,
+        context=ResearchAgentContext(
+            db=db
+        ),
     )
 
-    # 6. Get the latest AI response
+    # 4. Get final AI message
     ai_message = result["messages"][-1]
 
-    # 7. Update conversation timestamp
+    # 5. Update conversation timestamp
     conversation.updated_at = func.now()
 
     db.commit()
     db.refresh(conversation)
 
-
-
-    # 8. Return response
+    # 6. Return response
     return {
         "conversation_id": conversation.id,
         "paper_id": conversation.paper_id,
