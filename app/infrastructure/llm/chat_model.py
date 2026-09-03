@@ -1,10 +1,13 @@
-from langchain_ollama import ChatOllama
+from langchain_openai import ChatOpenAI
+
+from app.config.settings import settings
 
 
 def get_chat_model():
 
-    return ChatOllama(
-        model="qwen2.5:1.5b",
-        base_url="http://localhost:11434",
+    return ChatOpenAI(
+        model="openai/gpt-oss-20b",
+        api_key=settings.OPENROUTER_API_KEY,
+        base_url="https://openrouter.ai/api/v1",
         temperature=0.2,
     )

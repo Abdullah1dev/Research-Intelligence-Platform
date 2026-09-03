@@ -1,7 +1,6 @@
 from langgraph.graph import (
     StateGraph,
     START,
-    END,
 )
 
 from langgraph.prebuilt import (
@@ -11,6 +10,10 @@ from langgraph.prebuilt import (
 
 from app.infrastructure.agent.state import (
     ResearchAgentState,
+)
+
+from app.infrastructure.agent.context import (
+    ResearchAgentContext,
 )
 
 from app.infrastructure.agent.tools.rag_tool import (
@@ -33,9 +36,16 @@ def research_assistant_node(
     state: ResearchAgentState,
 ):
 
+    print("========== AVAILABLE TOOLS ==========")
+    print(
+        llm_with_tools.kwargs.get("tools")
+    )
+    print("======================================")
+
     response = llm_with_tools.invoke(
         state["messages"]
     )
+
     print("========== AGENT RESPONSE ==========")
     print("Content:", response.content)
     print("Tool calls:", response.tool_calls)
@@ -51,7 +61,8 @@ def build_research_agent(
 ):
 
     graph = StateGraph(
-        ResearchAgentState
+        ResearchAgentState,
+        context_schema=ResearchAgentContext,
     )
 
     # Assistant
