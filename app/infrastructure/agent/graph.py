@@ -36,6 +36,10 @@ def research_assistant_node(
     response = llm_with_tools.invoke(
         state["messages"]
     )
+    print("========== AGENT RESPONSE ==========")
+    print("Content:", response.content)
+    print("Tool calls:", response.tool_calls)
+    print("====================================")
 
     return {
         "messages": [response]

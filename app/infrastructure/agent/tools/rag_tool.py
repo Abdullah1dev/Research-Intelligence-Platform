@@ -20,10 +20,23 @@ def search_paper(
     question: str,
     runtime: ToolRuntime,
 ) -> str:
+    
     """
-    Search the current research paper and retrieve
-    relevant information to answer the user's question.
+    Search the current research paper using semantic RAG retrieval.
+
+    Use this tool whenever the user asks a question about the
+    current research paper, its PDF, its contents, methodology,
+    findings, results, authors, datasets, experiments, limitations,
+    contributions, or any other information that should be answered
+    from the paper.
+
+    Do not use this tool for general conversation or questions that
+    are unrelated to the current research paper.
     """
+
+    print("========== RAG TOOL EXECUTED ==========")
+    
+    
 
     db: Session = runtime.context.db
 
