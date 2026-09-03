@@ -1,3 +1,5 @@
+from langchain_core.messages import SystemMessage
+
 from langgraph.graph import (
     StateGraph,
     START,
@@ -32,6 +34,27 @@ llm_with_tools = llm.bind_tools(
 )
 
 
+SYSTEM_PROMPT = """
+You are a research assistant.
+
+You are helping the user understand the research paper
+associated with the current conversation.
+
+Whenever the user asks a question that requires information
+from the research paper, its PDF, its contents, methodology,
+findings, results, authors, datasets, experiments, limitations,
+or contributions, you MUST use the search_paper tool.
+
+Do not answer paper-specific questions from your own knowledge.
+
+For general conversation or questions unrelated to the paper,
+you may answer directly without using the tool.
+
+After receiving the tool result, use that information to provide
+a clear and accurate answer to the user.
+"""
+
+
 def research_assistant_node(
     state: ResearchAgentState,
 ):
@@ -42,8 +65,13 @@ def research_assistant_node(
     )
     print("======================================")
 
+    messages = [
+        SystemMessage(content=SYSTEM_PROMPT),
+        *state["messages"],
+    ]
+
     response = llm_with_tools.invoke(
-        state["messages"]
+        messages
     )
 
     print("========== AGENT RESPONSE ==========")
@@ -65,13 +93,11 @@ def build_research_agent(
         context_schema=ResearchAgentContext,
     )
 
-    # Assistant
     graph.add_node(
         "research_assistant",
         research_assistant_node,
     )
 
-    # Tools
     graph.add_node(
         "tools",
         ToolNode(
@@ -79,19 +105,16 @@ def build_research_agent(
         ),
     )
 
-    # Start
     graph.add_edge(
         START,
         "research_assistant",
     )
 
-    # Decide whether tool is required
     graph.add_conditional_edges(
         "research_assistant",
         tools_condition,
     )
 
-    # Tool result goes back to LLM
     graph.add_edge(
         "tools",
         "research_assistant",
