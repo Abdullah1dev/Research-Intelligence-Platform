@@ -58,30 +58,43 @@ a clear and accurate answer to the user.
 def research_assistant_node(
     state: ResearchAgentState,
 ):
+    print("\n========== STATE MESSAGES ==========")
 
-    print("========== AVAILABLE TOOLS ==========")
-    print(
-        llm_with_tools.kwargs.get("tools")
-    )
-    print("======================================")
+    for i, message in enumerate(state["messages"]):
+        print(f"\n--- MESSAGE {i} ---")
+        print("TYPE:", type(message))
+        print("CONTENT:", message.content)
+        print("TOOL CALLS:", getattr(message, "tool_calls", None))
+        print("ADDITIONAL KWARGS:", message.additional_kwargs)
+
+    print("\n========== END STATE MESSAGES ==========")
 
     messages = [
         SystemMessage(content=SYSTEM_PROMPT),
         *state["messages"],
     ]
 
-    response = llm_with_tools.invoke(
-        messages
-    )
+    print("\n========== MESSAGES SENT TO MODEL ==========")
 
-    print("========== AGENT RESPONSE ==========")
-    print("Content:", response.content)
-    print("Tool calls:", response.tool_calls)
+    for i, message in enumerate(messages):
+        print(f"\n--- MODEL MESSAGE {i} ---")
+        print("TYPE:", type(message))
+        print("CONTENT:", message.content)
+
+    print("\n========== INVOKING MODEL ==========")
+
+    response = llm_with_tools.invoke(messages)
+
+    print("\n========== MODEL RESPONSE ==========")
+    print("CONTENT:", response.content)
+    print("TOOL CALLS:", response.tool_calls)
+    print("ADDITIONAL KWARGS:", response.additional_kwargs)
     print("====================================")
 
     return {
         "messages": [response]
     }
+
 
 
 def build_research_agent(
