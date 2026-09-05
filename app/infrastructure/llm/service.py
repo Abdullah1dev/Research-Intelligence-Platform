@@ -1,32 +1,30 @@
-import requests
+from langchain_openai import ChatOpenAI
+
+from app.config.settings import settings
 
 
 class LLMService:
 
     def __init__(
         self,
-        model: str = "qwen2.5:1.5b",
-        base_url: str = "http://localhost:11434",
+        model: str = "openai/gpt-oss-20b",
     ):
         self.model = model
-        self.base_url = base_url
+
+        self.llm = ChatOpenAI(
+            model=self.model,
+            api_key=settings.OPENROUTER_API_KEY,
+            base_url="https://openrouter.ai/api/v1",
+            temperature=0.2,
+        )
 
     def generate(
         self,
         prompt: str,
     ) -> str:
 
-        response = requests.post(
-            f"{self.base_url}/api/generate",
-            json={
-                "model": self.model,
-                "prompt": prompt,
-                "stream": False,
-            },
+        response = self.llm.invoke(
+            prompt
         )
 
-        response.raise_for_status()
-
-        data = response.json()
-
-        return data["response"]
+        return response.content
