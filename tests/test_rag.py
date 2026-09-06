@@ -1,100 +1,45 @@
 from app.infrastructure.database.config import SessionLocal
-
-from app.features.papers.models import (
-    PaperDocument,
-)
-
-from app.infrastructure.embeddings.service import (
-    EmbeddingService,
-)
-
-from app.infrastructure.vector_search.service import (
-    VectorSearchService,
-)
-
-from app.infrastructure.rag.context_builder import (
-    RAGContextBuilder,
-)
-
-from app.infrastructure.llm.service import (
-    LLMService,
-)
-
-from app.infrastructure.rag.service import (
-    RAGService,
-)
-from app.features.papers.enums import (
-    DocumentProcessingStatus,
-)
-from app.features.users.models import User
+from app.infrastructure.rag.dependencies import get_rag_service
 
 
-def test_rag():
+def main():
 
     db = SessionLocal()
 
     try:
 
-        # Get an existing document
-        document = (
-            db.query(PaperDocument)
-            .filter(
-                PaperDocument.processing_status
-                == DocumentProcessingStatus.COMPLETED
-            )
-            .first()
-        )
+        rag_service = get_rag_service()
 
-        if not document:
-            print("No completed document found.")
-            return
+        document_id = 12  # CHANGE THIS
 
-        print(
-            f"\nUsing document: {document.file_name}"
-        )
-
-        print(
-            f"Document ID: {document.id}"
-        )
-
-        # Initialize services
-        embedding_service = EmbeddingService()
-
-        vector_search_service = (
-            VectorSearchService(
-                embedding_service=embedding_service
-            )
-        )
-
-        context_builder = RAGContextBuilder()
-
-        llm_service = LLMService()
-
-        rag_service = RAGService(
-            vector_search_service=vector_search_service,
-            context_builder=context_builder,
-            llm_service=llm_service,
-        )
-
-        # Ask question
-        question = (
-            "What is this document about?"
-        )
-
-        print("\nQUESTION:")
-        print(question)
-
-        print("\nSearching document...\n")
-
-        # Run complete RAG pipeline
-        answer = rag_service.ask(
+        result = rag_service.ask(
             db=db,
-            document_id=document.id,
-            question=question,
+            document_id=document_id,
+            question="What is the main methodology used in this paper?",
         )
 
-        print("\nFINAL ANSWER:")
-        print(answer)
+        print("\n========== ANSWER ==========")
+        print(result["answer"])
+
+        print("\n========== SOURCES ==========")
+
+        for source in result["sources"]:
+
+            print(
+                f"\nChunk ID: {source['chunk_id']}"
+            )
+
+            print(
+                f"Chunk Index: {source['chunk_index']}"
+            )
+
+            print(
+                f"Similarity: {source['similarity_score']}"
+            )
+
+            print(
+                source["content"][:500]
+            )
 
     finally:
 
@@ -102,4 +47,4 @@ def test_rag():
 
 
 if __name__ == "__main__":
-    test_rag()
+    main()
