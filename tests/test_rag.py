@@ -1,6 +1,6 @@
 from app.infrastructure.database.config import SessionLocal
 from app.infrastructure.rag.dependencies import get_rag_service
-
+from app.features.users.models import User
 
 def main():
 
