@@ -2,6 +2,16 @@ from app.infrastructure.database.config import SessionLocal
 from app.infrastructure.rag.dependencies import get_rag_service
 from app.features.users.models import User
 
+
+from app.features.papers.models import (
+    Paper,
+    PaperDocument,
+    DocumentChunk,
+)
+
+from app.features.conversations.models import Conversation
+
+
 def main():
 
     db = SessionLocal()
@@ -10,7 +20,7 @@ def main():
 
         rag_service = get_rag_service()
 
-        document_id = 12  # CHANGE THIS
+        document_id = 12
 
         result = rag_service.ask(
             db=db,
