@@ -34,7 +34,7 @@ def search_paper(
     are unrelated to the current research paper.
     """
 
-    print("========== RAG TOOL EXECUTED ==========")
+    
     
     
 
