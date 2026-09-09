@@ -21,22 +21,40 @@ class VectorSearchService:
         similarity_threshold: float = 0.5,
     ) -> list[dict]:
 
+        print("\n========== VECTOR SEARCH START ==========")
+        print(f"Document ID: {document_id}")
+        print(f"Query: {query}")
+        print(f"Top K: {top_k}")
+        print(f"Similarity Threshold: {similarity_threshold}")
+        print("=========================================")
+
+        # 1. Validate query
         if not query or not query.strip():
+            print("Empty query received.")
             return []
 
-        # 1. Generate embedding for the user's query
+        # 2. Generate embedding for the user's query
+        print("\nGenerating query embedding...")
+
         query_embedding = (
             self.embedding_service.embed_query(query)
         )
 
-        # 2. Calculate cosine distance
+        print(
+            f"Query embedding dimensions: "
+            f"{len(query_embedding)}"
+        )
+
+        # 3. Calculate cosine distance
         distance = (
             DocumentChunk.embedding.cosine_distance(
                 query_embedding
             )
         )
 
-        # 3. Search the most relevant chunks
+        # 4. Retrieve the top-k nearest chunks
+        print("\nSearching PostgreSQL / pgvector...")
+
         results = (
             db.query(
                 DocumentChunk,
@@ -50,16 +68,34 @@ class VectorSearchService:
             .all()
         )
 
+        print(
+            f"Retrieved {len(results)} candidate chunks."
+        )
+
+        # 5. Convert distance to similarity
         sources = []
 
-        # 4. Convert distance to similarity
+        print("\n========== SIMILARITY SCORES ==========")
+
         for chunk, cosine_distance in results:
 
-            similarity_score = (
-                1 - float(cosine_distance)
+            cosine_distance = float(
+                cosine_distance
             )
 
-            # 5. Apply similarity threshold
+            similarity_score = (
+                1 - cosine_distance
+            )
+
+            print(
+                f"Chunk {chunk.chunk_index} | "
+                f"Distance: {cosine_distance:.4f} | "
+                f"Similarity: {similarity_score:.4f} | "
+                f"Accepted: "
+                f"{similarity_score >= similarity_threshold}"
+            )
+
+            # 6. Apply similarity threshold
             if similarity_score >= similarity_threshold:
 
                 sources.append(
@@ -71,5 +107,14 @@ class VectorSearchService:
                         ),
                     }
                 )
+
+        print("=========================================")
+
+        print(
+            f"Accepted {len(sources)} "
+            f"chunks after threshold filtering."
+        )
+
+        print("========== VECTOR SEARCH END ==========\n")
 
         return sources

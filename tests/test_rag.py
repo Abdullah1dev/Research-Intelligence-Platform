@@ -20,7 +20,7 @@ def main():
 
         rag_service = get_rag_service()
 
-        document_id = 12
+        document_id = 22
 
         result = rag_service.ask(
             db=db,
