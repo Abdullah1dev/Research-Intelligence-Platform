@@ -188,6 +188,37 @@ def get_papers(
     }
 
 
+#Search Paper
+def search_papers(
+    db: Session,
+    user_id: int,
+    search: str,
+    limit: int = 5,
+):
+    if not search or not search.strip():
+        return []
+
+    search_pattern = f"%{search.strip()}%"
+
+    query = (
+        select(Paper)
+        .where(
+            Paper.owner_id == user_id,
+            or_(
+                Paper.title.ilike(search_pattern),
+                Paper.authors.ilike(search_pattern),
+            ),
+        )
+        .order_by(
+            Paper.created_at.desc()
+        )
+        .limit(limit)
+    )
+
+    result = db.execute(query)
+
+    return result.scalars().all()
+
 #get paper by id
 
 def get_paper_by_id(
