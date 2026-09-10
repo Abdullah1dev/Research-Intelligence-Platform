@@ -188,13 +188,13 @@ def get_papers(
     }
 
 
-#Search Paper
 def search_papers(
     db: Session,
     user_id: int,
     search: str,
     limit: int = 5,
 ):
+
     if not search or not search.strip():
         return []
 
@@ -217,7 +217,22 @@ def search_papers(
 
     result = db.execute(query)
 
-    return result.scalars().all()
+    papers = result.scalars().all()
+
+    # Debug
+    print("SEARCH QUERY:", search)
+    print("USER ID:", user_id)
+    print("FOUND PAPERS:", len(papers))
+
+    for paper in papers:
+        print(
+            "PAPER:",
+            paper.id,
+            paper.title,
+        )
+
+    return papers
+
 
 #get paper by id
 

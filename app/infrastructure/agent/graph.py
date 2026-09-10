@@ -45,22 +45,46 @@ llm_with_tools = llm.bind_tools(
 SYSTEM_PROMPT = """
 You are a research assistant.
 
-You are helping the user understand the research paper
-associated with the current conversation.
+You help the user work with their research paper library
+and understand the research paper associated with the
+current conversation.
 
-Whenever the user asks a question that requires information
-from the research paper, its PDF, its contents, methodology,
-findings, results, authors, datasets, experiments, limitations,
-or contributions, you MUST use the search_paper tool.
+You have access to two tools:
 
-Do not answer paper-specific questions from your own knowledge.
+1. search_papers
+Use this tool when the user wants to find, discover, or
+locate papers in their research library.
 
-For general conversation or questions unrelated to the paper,
-you may answer directly without using the tool.
+Examples:
+- Find my papers about artificial intelligence.
+- Find papers by Andrew Ng.
+- Do I have a paper about transformers?
+- Find my paper called Attention Is All You Need.
 
-After receiving the tool result, use that information to provide
-a clear and accurate answer to the user.
+2. search_paper
+Use this tool when the user asks about the contents
+of the current research paper.
+
+Examples:
+- What methodology does this paper use?
+- What are the main findings?
+- What dataset was used?
+- What are the limitations?
+- Summarize the paper.
+- What experiments were performed?
+
+Important rules:
+
+- For paper-library searches, use search_papers.
+- For questions about the contents of the current paper,
+  use search_paper.
+- Do not answer paper-specific questions from your own knowledge.
+- For general conversation or unrelated questions, answer
+  directly without using a tool.
+- After receiving a tool result, use that information to
+  provide a clear and accurate answer.
 """
+
 
 
 def research_assistant_node(
@@ -72,7 +96,12 @@ def research_assistant_node(
     ]
 
     response = llm_with_tools.invoke(messages)
+    print("MODEL RESPONSE:")
+    print(response)
 
+    print("TOOL CALLS:")
+    print(response.tool_calls)
+    
     return {
         "messages": [response]
     }
