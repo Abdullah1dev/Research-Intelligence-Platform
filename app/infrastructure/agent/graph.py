@@ -26,11 +26,19 @@ from app.infrastructure.llm.chat_model import (
     get_chat_model,
 )
 
+from app.infrastructure.agent.tools.rag_tool import search_paper
+from app.infrastructure.agent.tools.search_papers import search_papers
+
 
 llm = get_chat_model()
 
 llm_with_tools = llm.bind_tools(
-    [search_paper]
+    [
+    search_paper,
+    search_papers
+    
+    ]
+    
 )
 
 
@@ -87,7 +95,10 @@ def build_research_agent(
     graph.add_node(
         "tools",
         ToolNode(
-            [search_paper]
+            [
+            search_paper,
+            search_papers
+        ]
         ),
     )
 
