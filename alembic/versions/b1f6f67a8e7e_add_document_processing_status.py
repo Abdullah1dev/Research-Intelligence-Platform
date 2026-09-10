@@ -23,7 +23,7 @@ def upgrade():
         "processing",
         "completed",
         "failed",
-        name="documentprocessingstatus",
+        name="documentprocessingstatus",   
         create_type=False,
     )
 

@@ -1,5 +1,10 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+from app.features.papers.models import (
+    PaperDocument,
+    DocumentChunk,
+)
+
 
 class DocumentChunker:
 

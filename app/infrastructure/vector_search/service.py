@@ -25,9 +25,20 @@ class VectorSearchService:
         if not query or not query.strip():
             return []
 
+        print("\n========== VECTOR SEARCH ==========")
+        print("Document ID:", document_id)
+        print("Query:", query)
+        print("Top K:", top_k)
+        print("Similarity threshold:", similarity_threshold)
+
         # Generate embedding for the user's query
         query_embedding = (
             self.embedding_service.embed_query(query)
+        )
+
+        print(
+            "Query embedding dimensions:",
+            len(query_embedding),
         )
 
         # Calculate cosine distance
@@ -51,6 +62,11 @@ class VectorSearchService:
             .all()
         )
 
+        print(
+            "Retrieved candidate chunks:",
+            len(results),
+        )
+
         # Convert distance to similarity
         sources = []
 
@@ -64,8 +80,19 @@ class VectorSearchService:
                 1 - cosine_distance
             )
 
+            print(
+                f"Chunk {chunk.chunk_index} "
+                f"| Distance: {cosine_distance:.4f} "
+                f"| Similarity: {similarity_score:.4f}"
+            )
+
             # Apply similarity threshold
             if similarity_score >= similarity_threshold:
+
+                print(
+                    f"  ✓ Accepted chunk "
+                    f"{chunk.chunk_index}"
+                )
 
                 sources.append(
                     {
@@ -76,5 +103,21 @@ class VectorSearchService:
                         ),
                     }
                 )
+
+            else:
+
+                print(
+                    f"  ✗ Rejected chunk "
+                    f"{chunk.chunk_index}"
+                )
+
+        print(
+            "Accepted chunks:",
+            len(sources),
+        )
+
+        print(
+            "===================================\n"
+        )
 
         return sources

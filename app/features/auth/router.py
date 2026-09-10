@@ -93,3 +93,6 @@ def admin_test(
         "message": "You are an admin",
         "user": current_user.name,
     }
+    
+    
+
