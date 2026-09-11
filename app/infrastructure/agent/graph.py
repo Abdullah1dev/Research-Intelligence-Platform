@@ -95,16 +95,23 @@ def research_assistant_node(
         *state["messages"],
     ]
 
+    print("AVAILABLE TOOLS:")
+    print(llm_with_tools.kwargs.get("tools"))
+
     response = llm_with_tools.invoke(messages)
+
     print("MODEL RESPONSE:")
     print(response)
 
     print("TOOL CALLS:")
     print(response.tool_calls)
-    
+
     return {
         "messages": [response]
     }
+    
+    
+
 
 
 def build_research_agent(

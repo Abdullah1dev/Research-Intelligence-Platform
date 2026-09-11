@@ -10,10 +10,31 @@ def search_papers(
     runtime: ToolRuntime,
 ) -> str:
     """
-    Search the user's research papers by title or author.
+    Search the user's research paper library by title or author.
 
-    Use this tool when the user wants to find or discover
-    papers from their research library.
+    Use this tool whenever the user wants to find, locate,
+    or discover a paper in their library.
+
+    IMPORTANT:
+    - Preserve the user's search terms exactly.
+    - If the user provides a paper title, pass the full title
+      as the query.
+    - If the user provides an author's name, pass the author's
+      name as the query.
+    - Do not replace a specific title or author with a broader
+      keyword or category.
+    - Do not summarize, shorten, or reinterpret the user's query.
+
+    Examples:
+
+    User: "Find my paper called Attention Is All You Need"
+    Query: "Attention Is All You Need"
+
+    User: "Find papers by Andrew Ng"
+    Query: "Andrew Ng"
+
+    User: "Do I have a paper about transformers?"
+    Query: "transformers"
 
     Do not use this tool for questions about the contents
     of a specific paper.
