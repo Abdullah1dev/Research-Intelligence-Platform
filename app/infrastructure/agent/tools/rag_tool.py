@@ -34,7 +34,8 @@ def search_paper(
     are unrelated to the current research paper.
     """
 
-    
+    print("\n🔥 SEARCH_PAPER TOOL EXECUTED")
+    print("QUESTION:", question)
     
     
 

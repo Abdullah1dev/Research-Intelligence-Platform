@@ -39,7 +39,10 @@ def search_papers(
     Do not use this tool for questions about the contents
     of a specific paper.
     """
-
+    print("\n🔥 SEARCH_PAPERS TOOL EXECUTED")
+    print("QUERY:", query)
+    
+    
     db: Session = runtime.context.db
     user_id = runtime.state["user_id"]
 
@@ -55,7 +58,7 @@ def search_papers(
 
     results = []
 
-    for paper in papers:
+    for paper in papers: 
         results.append(
             (
                 f"Paper ID: {paper.id}\n"
