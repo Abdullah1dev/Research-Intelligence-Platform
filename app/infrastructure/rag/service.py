@@ -16,8 +16,9 @@ class RAGService:
         self.vector_search_service = vector_search_service
         self.context_builder = context_builder
         self.llm_service = llm_service
-
-    def ask(
+    
+    #Retrieveal method for only chunking and context building
+    def retrieve(
         self,
         db: Session,
         document_id: int,
@@ -35,17 +36,14 @@ class RAGService:
             similarity_threshold=similarity_threshold,
         )
 
-        # 2. Stop if no sufficiently relevant chunks exist
+        # 2. Stop if no relevant chunks were found
         if not search_results:
             return {
-                "answer": (
-                    "I could not find relevant information "
-                    "in this document."
-                ),
+                "context": "",
                 "sources": [],
             }
 
-        # 3. Extract chunks for the context builder
+        # 3. Extract chunks
         chunks = [
             result["chunk"]
             for result in search_results
@@ -58,6 +56,57 @@ class RAGService:
 
         if not context:
             return {
+                "context": "",
+                "sources": [],
+            }
+
+        # 5. Prepare source information
+        sources = []
+
+        for result in search_results:
+
+            chunk = result["chunk"]
+
+            sources.append(
+                {
+                    "chunk_id": chunk.id,
+                    "chunk_index": chunk.chunk_index,
+                    "content": chunk.content,
+                    "similarity_score": (
+                        result["similarity_score"]
+                    ),
+                }
+            )
+
+        # 6. Return retrieval result
+        return {
+            "context": context,
+            "sources": sources,
+        }
+
+
+    #Ask method for llm generation
+    def ask(
+        self,
+        db: Session,
+        document_id: int,
+        question: str,
+        top_k: int = 4,
+        similarity_threshold: float = 0.5,
+    ) -> dict:
+
+        # 1. Retrieve relevant information
+        retrieval = self.retrieve(
+            db=db,
+            document_id=document_id,
+            question=question,
+            top_k=top_k,
+            similarity_threshold=similarity_threshold,
+        )
+
+        # 2. Stop if nothing relevant was retrieved
+        if not retrieval["sources"]:
+            return {
                 "answer": (
                     "I could not find relevant information "
                     "in this document."
@@ -65,7 +114,9 @@ class RAGService:
                 "sources": [],
             }
 
-        # 5. Build the RAG prompt
+        context = retrieval["context"]
+
+        # 3. Build RAG prompt
         prompt = f"""
 You are a research paper assistant.
 
@@ -86,31 +137,13 @@ Question:
 Answer:
 """
 
-        # 6. Generate answer
+        # 4. Generate answer
         answer = self.llm_service.generate(
             prompt
         )
 
-        # 7. Prepare source information
-        sources = []
-
-        for result in search_results:
-
-            chunk = result["chunk"]
-
-            sources.append(
-                {
-                    "chunk_id": chunk.id,
-                    "chunk_index": chunk.chunk_index,
-                    "content": chunk.content,
-                    "similarity_score": (
-                        result["similarity_score"]
-                    ),
-                }
-            )
-
-        # 8. Return answer and sources
+        # 5. Return answer and sources
         return {
             "answer": answer,
-            "sources": sources,
+            "sources": retrieval["sources"],
         }
