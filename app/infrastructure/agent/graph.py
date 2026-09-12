@@ -22,23 +22,22 @@ from app.infrastructure.agent.tools.rag_tool import (
     search_paper,
 )
 
+from app.infrastructure.agent.tools.search_papers import (
+    search_papers,
+)
+
 from app.infrastructure.llm.chat_model import (
     get_chat_model,
 )
-
-from app.infrastructure.agent.tools.rag_tool import search_paper
-from app.infrastructure.agent.tools.search_papers import search_papers
 
 
 llm = get_chat_model()
 
 llm_with_tools = llm.bind_tools(
     [
-    search_paper,
-    search_papers
-    
+        search_paper,
+        search_papers,
     ]
-    
 )
 
 
@@ -52,6 +51,7 @@ current conversation.
 You have access to two tools:
 
 1. search_papers
+
 Use this tool when the user wants to find, discover, or
 locate papers in their research library.
 
@@ -62,6 +62,7 @@ Examples:
 - Find my paper called Attention Is All You Need.
 
 2. search_paper
+
 Use this tool when the user asks about the contents
 of the current research paper.
 
@@ -78,6 +79,15 @@ Important rules:
 - For paper-library searches, use search_papers.
 - For questions about the contents of the current paper,
   use search_paper.
+- When calling search_paper, pass the user's complete question
+  as the question argument.
+- Preserve the user's wording and intent.
+- Do not reduce the question to a keyword or short phrase.
+- Do not summarize or rewrite the question before passing it
+  to search_paper.
+- For paper-library searches, preserve the user's search terms.
+- If the user provides an exact paper title or author name,
+  pass the exact title or author name to search_papers.
 - Do not answer paper-specific questions from your own knowledge.
 - For general conversation or unrelated questions, answer
   directly without using a tool.
@@ -86,19 +96,23 @@ Important rules:
 """
 
 
-
 def research_assistant_node(
     state: ResearchAgentState,
 ):
+
     messages = [
         SystemMessage(content=SYSTEM_PROMPT),
         *state["messages"],
     ]
 
     print("AVAILABLE TOOLS:")
-    print(llm_with_tools.kwargs.get("tools"))
+    print(
+        llm_with_tools.kwargs.get("tools")
+    )
 
-    response = llm_with_tools.invoke(messages)
+    response = llm_with_tools.invoke(
+        messages
+    )
 
     print("MODEL RESPONSE:")
     print(response)
@@ -109,9 +123,6 @@ def research_assistant_node(
     return {
         "messages": [response]
     }
-    
-    
-
 
 
 def build_research_agent(
@@ -132,9 +143,9 @@ def build_research_agent(
         "tools",
         ToolNode(
             [
-            search_paper,
-            search_papers
-        ]
+                search_paper,
+                search_papers,
+            ]
         ),
     )
 

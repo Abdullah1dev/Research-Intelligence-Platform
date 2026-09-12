@@ -93,19 +93,19 @@ def search_paper(
         )
 
     # 7. Return retrieved evidence to the agent
+    source_references = "\n".join(
+    [
+        (
+            f"- Chunk {source['chunk_index']} "
+            f"(similarity: {source['similarity_score']})"
+        )
+        for source in result["sources"]
+    ]
+)
+
     return (
         f"Relevant information from the paper:\n\n"
         f"{result['context']}\n\n"
-        f"Sources:\n"
-        + "\n\n".join(
-            [
-                (
-                    f"Chunk {source['chunk_index']} "
-                    f"(similarity: "
-                    f"{source['similarity_score']}):\n"
-                    f"{source['content']}"
-                )
-                for source in result["sources"]
-            ]
-        )
+        f"Source references:\n"
+        f"{source_references}"
     )
