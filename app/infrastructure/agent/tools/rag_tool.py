@@ -30,6 +30,13 @@ def search_paper(
 
     Do not use this tool for general conversation or questions that
     are unrelated to the current research paper.
+    - When answering paper-specific questions, use only facts
+    explicitly supported by the retrieved evidence.
+    - Do not infer, speculate, or add general domain knowledge.
+    - If the evidence does not support a claim, say that the
+    paper does not provide enough information.
+    - Do not treat an implication as an explicit statement.
+    
     """
 
     print("\n🔥 SEARCH_PAPER TOOL EXECUTED")
@@ -104,8 +111,11 @@ def search_paper(
 )
 
     return (
-        f"Relevant information from the paper:\n\n"
-        f"{result['context']}\n\n"
-        f"Source references:\n"
-        f"{source_references}"
+    "Retrieved evidence from the current paper.\n\n"
+    "Use only the information explicitly supported "
+    "by this evidence.\n\n"
+    f"{result['context']}\n\n"
+    f"Source references:\n"
+    f"{source_references}"
+    
     )
