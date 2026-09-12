@@ -10,9 +10,7 @@ from app.features.papers.enums import (
     DocumentProcessingStatus,
 )
 
-from app.infrastructure.rag.service import RAGService
 from app.infrastructure.rag.dependencies import get_rag_service
-
 
 
 @tool
@@ -20,7 +18,7 @@ def search_paper(
     question: str,
     runtime: ToolRuntime,
 ) -> str:
-    
+
     """
     Search the current research paper using semantic RAG retrieval.
 
@@ -36,8 +34,6 @@ def search_paper(
 
     print("\n🔥 SEARCH_PAPER TOOL EXECUTED")
     print("QUESTION:", question)
-    
-    
 
     db: Session = runtime.context.db
 
@@ -79,26 +75,27 @@ def search_paper(
             f"Current status: {document.processing_status}"
         )
 
-    # 4. Get existing RAG service
+    # 4. Get RAG service
     rag_service = get_rag_service()
 
-    # 5. Run existing RAG pipeline
-    result = rag_service.ask(
+    # 5. Retrieve relevant paper information
+    result = rag_service.retrieve(
         db=db,
         document_id=document.id,
         question=question,
     )
 
-    # 6. Return information to the agent
+    # 6. Stop if nothing relevant was found
     if not result["sources"]:
         return (
             "No relevant information was found "
             "in the paper."
         )
 
+    # 7. Return retrieved evidence to the agent
     return (
-        f"Answer from the paper:\n"
-        f"{result['answer']}\n\n"
+        f"Relevant information from the paper:\n\n"
+        f"{result['context']}\n\n"
         f"Sources:\n"
         + "\n\n".join(
             [
