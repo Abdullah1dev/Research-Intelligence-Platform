@@ -28,14 +28,29 @@ def search_paper(
     contributions, or any other information that should be answered
     from the paper.
 
-    Do not use this tool for general conversation or questions that
-    are unrelated to the current research paper.
-    - When answering paper-specific questions, use only facts
-    explicitly supported by the retrieved evidence.
-    - Do not infer, speculate, or add general domain knowledge.
-    - If the evidence does not support a claim, say that the
-    paper does not provide enough information.
-    - Do not treat an implication as an explicit statement.
+    Grounding rules for paper-specific questions:
+
+    - When answering a question about the current paper, use only
+    information explicitly supported by the retrieved evidence
+    returned by search_paper.
+
+    - Do not use your general knowledge to fill missing information.
+
+    - Do not infer, speculate, or make assumptions beyond the evidence.
+
+    - Do not convert an implication into an explicit claim.
+
+    - If the retrieved evidence does not contain enough information
+    to answer the question, clearly say that the paper does not
+    provide enough information in the retrieved evidence.
+
+    - If only part of the question is supported, answer only the
+    supported part and clearly identify what cannot be determined.
+
+    - Do not present general knowledge as if it came from the paper.
+
+    - When possible, distinguish between what the paper explicitly
+    states and what cannot be established from the retrieved evidence.
     
     """
 
@@ -111,11 +126,11 @@ def search_paper(
 )
 
     return (
-    "Retrieved evidence from the current paper.\n\n"
-    "Use only the information explicitly supported "
-    "by this evidence.\n\n"
+    "RETRIEVED EVIDENCE FROM THE CURRENT PAPER.\n\n"
+    "Use this evidence as the only source of information "
+    "for answering the user's paper-specific question.\n\n"
     f"{result['context']}\n\n"
-    f"Source references:\n"
+    "SOURCE REFERENCES:\n"
     f"{source_references}"
     
     )

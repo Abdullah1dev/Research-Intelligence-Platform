@@ -29,7 +29,9 @@ from app.infrastructure.agent.tools.search_papers import (
 from app.infrastructure.llm.chat_model import (
     get_chat_model,
 )
-
+from app.infrastructure.agent.context_manager import (
+    build_model_context,
+)
 
 llm = get_chat_model()
 
@@ -100,30 +102,22 @@ def research_assistant_node(
     state: ResearchAgentState,
 ):
 
+    recent_messages = build_model_context(
+        state["messages"]
+    )
+
     messages = [
         SystemMessage(content=SYSTEM_PROMPT),
-        *state["messages"],
+        *recent_messages,
     ]
 
     print("AVAILABLE TOOLS:")
-    print(
-        llm_with_tools.kwargs.get("tools")
-    )
+    print(llm_with_tools.kwargs.get("tools"))
 
-    response = llm_with_tools.invoke(
-        messages
-    )
-
-    print("MODEL RESPONSE:")
-    print(response)
-
-    print("TOOL CALLS:")
-    print(response.tool_calls)
-
-    return {
-        "messages": [response]
-    }
-
+    response = llm_with_tools.invoke(messages)
+    
+    
+    
 
 def build_research_agent(
     checkpointer,
