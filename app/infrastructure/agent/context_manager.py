@@ -1,7 +1,10 @@
-from langchain_core.messages import AnyMessage
+from langchain_core.messages import (
+    AnyMessage,
+    HumanMessage,
+)
 
 
-MAX_RECENT_MESSAGES = 8
+MAX_RECENT_TURNS = 4
 
 
 def build_model_context(
@@ -11,4 +14,15 @@ def build_model_context(
     if not messages:
         return []
 
-    return messages[-MAX_RECENT_MESSAGES:]
+    human_indexes = [
+        index
+        for index, message in enumerate(messages)
+        if isinstance(message, HumanMessage)
+    ]
+
+    if len(human_indexes) <= MAX_RECENT_TURNS:
+        return messages
+
+    start_index = human_indexes[-MAX_RECENT_TURNS]
+
+    return messages[start_index:]

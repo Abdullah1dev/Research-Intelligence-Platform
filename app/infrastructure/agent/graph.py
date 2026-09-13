@@ -102,19 +102,37 @@ def research_assistant_node(
     state: ResearchAgentState,
 ):
 
+    print("\n=== RESEARCH ASSISTANT NODE START ===")
+
+    print("TOTAL MESSAGES:", len(state["messages"]))
+
     recent_messages = build_model_context(
         state["messages"]
     )
+
+    print("RECENT MESSAGES:", len(recent_messages))
 
     messages = [
         SystemMessage(content=SYSTEM_PROMPT),
         *recent_messages,
     ]
 
-    print("AVAILABLE TOOLS:")
-    print(llm_with_tools.kwargs.get("tools"))
+    print("MESSAGES SENT TO LLM:", len(messages))
+    print("CALLING LLM...")
 
     response = llm_with_tools.invoke(messages)
+
+    print("LLM RETURNED")
+
+    print("MODEL RESPONSE:")
+    print(response)
+
+    print("TOOL CALLS:")
+    print(response.tool_calls)
+
+    return {
+        "messages": [response]
+    }
     
     
     
