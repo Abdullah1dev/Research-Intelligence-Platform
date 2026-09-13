@@ -3,7 +3,10 @@ from sqlalchemy.orm import Session
 from app.infrastructure.vector_search.service import VectorSearchService
 from app.infrastructure.rag.context_builder import RAGContextBuilder
 from app.infrastructure.llm.service import LLMService
-
+from app.infrastructure.rag.models import (
+    RetrievalResult,
+    RetrievalSource,
+)
 
 class RAGService:
 
@@ -68,21 +71,20 @@ class RAGService:
             chunk = result["chunk"]
 
             sources.append(
-                {
-                    "chunk_id": chunk.id,
-                    "chunk_index": chunk.chunk_index,
-                    "content": chunk.content,
-                    "similarity_score": (
-                        result["similarity_score"]
-                    ),
-                }
-            )
+                RetrievalSource(
+                    chunk_id=chunk.id,
+                    chunk_index=chunk.chunk_index,
+                    content=chunk.content,
+                    similarity_score=result["similarity_score"],
+                    
+                    )
+                )
 
         # 6. Return retrieval result
-        return {
-            "context": context,
-            "sources": sources,
-        }
+        return RetrievalResult(
+            context=context,
+            sources=sources,
+            )
 
 
     #Ask method for llm generation
@@ -105,7 +107,7 @@ class RAGService:
         )
 
         # 2. Stop if nothing relevant was retrieved
-        if not retrieval["sources"]:
+        if not retrieval.sources:
             return {
                 "answer": (
                     "I could not find relevant information "
@@ -114,7 +116,7 @@ class RAGService:
                 "sources": [],
             }
 
-        context = retrieval["context"]
+        context = retrieval.context
 
         # 3. Build RAG prompt
         prompt = f"""
@@ -145,5 +147,5 @@ Answer:
         # 5. Return answer and sources
         return {
             "answer": answer,
-            "sources": retrieval["sources"],
+            "sources": retrieval.sources,
         }
