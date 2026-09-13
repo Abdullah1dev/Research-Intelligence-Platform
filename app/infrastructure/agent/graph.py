@@ -29,8 +29,10 @@ from app.infrastructure.agent.tools.search_papers import (
 from app.infrastructure.llm.chat_model import (
     get_chat_model,
 )
+
 from app.infrastructure.agent.context_manager import (
     build_model_context,
+    estimate_message_tokens,
 )
 
 llm = get_chat_model()
@@ -104,23 +106,42 @@ def research_assistant_node(
 
     print("\n=== RESEARCH ASSISTANT NODE START ===")
 
-    print("TOTAL MESSAGES:", len(state["messages"]))
+    print(
+        "TOTAL MESSAGES:",
+        len(state["messages"])
+    )
 
     recent_messages = build_model_context(
         state["messages"]
     )
 
-    print("RECENT MESSAGES:", len(recent_messages))
+    print(
+        "RECENT MESSAGES:",
+        len(recent_messages)
+    )
+
+    print(
+        "ESTIMATED CONTEXT TOKENS:",
+        estimate_message_tokens(
+            recent_messages
+        )
+    )
 
     messages = [
         SystemMessage(content=SYSTEM_PROMPT),
         *recent_messages,
     ]
 
-    print("MESSAGES SENT TO LLM:", len(messages))
+    print(
+        "MESSAGES SENT TO LLM:",
+        len(messages)
+    )
+
     print("CALLING LLM...")
 
-    response = llm_with_tools.invoke(messages)
+    response = llm_with_tools.invoke(
+        messages
+    )
 
     print("LLM RETURNED")
 
