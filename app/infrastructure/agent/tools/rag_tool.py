@@ -9,6 +9,10 @@ from app.features.papers.models import (
 from app.features.papers.enums import (
     DocumentProcessingStatus,
 )
+from app.infrastructure.rag.models import (
+    RetrievalResult,
+    RetrievalSource,
+)
 
 from app.infrastructure.rag.dependencies import get_rag_service
 
@@ -108,7 +112,7 @@ def search_paper(
     )
 
     # 6. Stop if nothing relevant was found
-    if not result["sources"]:
+    if not result.sources:
         return (
             "No relevant information was found "
             "in the paper."
@@ -116,20 +120,18 @@ def search_paper(
 
     # 7. Return retrieved evidence to the agent
     source_references = "\n".join(
-    [
-        (
-            f"- Chunk {source['chunk_index']} "
-            f"(similarity: {source['similarity_score']})"
-        )
-        for source in result["sources"]
-    ]
-)
+    f"- Chunk {source.chunk_index} "
+    f"(similarity: {source.similarity_score})"
+    for source in result.sources
+    
+    )
+    
 
     return (
     "RETRIEVED EVIDENCE FROM THE CURRENT PAPER.\n\n"
     "Use this evidence as the only source of information "
     "for answering the user's paper-specific question.\n\n"
-    f"{result['context']}\n\n"
+    f"{result.context}\n\n"
     "SOURCE REFERENCES:\n"
     f"{source_references}"
     
