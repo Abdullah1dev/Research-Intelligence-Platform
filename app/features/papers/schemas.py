@@ -203,3 +203,13 @@ class PaperAnalysisResponse(BaseModel):
     document_id: int
 
     analysis: PaperAnalysisData
+    
+
+class RecommendedPaperResponse(BaseModel):
+    title: str
+    authors: list[str]
+    year: int | None = None
+    abstract: str | None = None
+    url: str | None = None
+    citation_count: int = 0
+    pdf_url: str | None = None
