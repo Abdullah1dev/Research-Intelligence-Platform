@@ -38,7 +38,7 @@ from app.features.papers.service import (
 from app.features.papers.schemas import (
     PaperAnalysisResponse,
 )
-
+from app.features.papers.schemas import RecommendedPaperResponse
 
 from app.features.papers.service import (
     analyze_paper,
@@ -321,6 +321,7 @@ def analyze_paper_endpoint(
 #Semantic Scholar endpoint
 @router.get(
     "/{paper_id}/recommendations",
+    response_model=list[RecommendedPaperResponse],
 )
 def get_paper_recommendations(
     paper_id: int,

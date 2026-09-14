@@ -75,4 +75,22 @@ class PaperRecommendationService:
             )
         )
 
-        return recommendations
+        return [
+            {
+                "title": recommendation.get("title"),
+                "authors": [
+                    author.get("name")
+                    for author in recommendation.get("authors", [])
+                ],
+                "year": recommendation.get("year"),
+                "abstract": recommendation.get("abstract"),
+                "url": recommendation.get("url"),
+                "citation_count": recommendation.get(
+                    "citationCount", 0
+                ),
+                "pdf_url": (
+                    recommendation.get("openAccessPdf") or {}
+                ).get("url"),
+            }
+            for recommendation in recommendations
+        ]
