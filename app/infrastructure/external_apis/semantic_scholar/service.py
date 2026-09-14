@@ -44,6 +44,9 @@ class SemanticScholarService:
             headers=headers,
             timeout=15,
         )
+        print("Semantic Scholar API key configured:", bool(
+        settings.SEMANTIC_SCHOLAR_API_KEY
+        ))
 
         if response.status_code != 429:
             response.raise_for_status()
@@ -157,8 +160,8 @@ class SemanticScholarService:
             "query": title,
             "limit": limit,
             "fields": (
-                "paperId,title,authors,"
-                "year,doi"
+                "paperId,title"
+                
             ),
         }
 
