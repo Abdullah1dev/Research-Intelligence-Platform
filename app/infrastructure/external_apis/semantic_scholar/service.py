@@ -30,6 +30,49 @@ class SemanticScholarService:
 
             self._last_request_time = time.monotonic()
 
+    def _get(
+        self,
+        url: str,
+        params: dict,
+        headers: dict,
+    ):
+        self._wait_for_rate_limit()
+
+        response = requests.get(
+            url,
+            params=params,
+            headers=headers,
+            timeout=15,
+        )
+
+        if response.status_code != 429:
+            response.raise_for_status()
+            return response
+
+        retry_after = response.headers.get(
+            "Retry-After"
+        )
+
+        if retry_after:
+            wait_time = float(retry_after)
+        else:
+            wait_time = 1.0
+
+        time.sleep(wait_time)
+
+        self._wait_for_rate_limit()
+
+        response = requests.get(
+            url,
+            params=params,
+            headers=headers,
+            timeout=15,
+        )
+
+        response.raise_for_status()
+
+        return response
+
     def get_paper_by_id(
         self,
         paper_id: str,
@@ -52,16 +95,11 @@ class SemanticScholarService:
                 settings.SEMANTIC_SCHOLAR_API_KEY
             )
 
-        self._wait_for_rate_limit()
-
-        response = requests.get(
-            url,
+        response = self._get(
+            url=url,
             params=params,
             headers=headers,
-            timeout=15,
         )
-
-        response.raise_for_status()
 
         return response.json()
 
@@ -91,16 +129,11 @@ class SemanticScholarService:
                 settings.SEMANTIC_SCHOLAR_API_KEY
             )
 
-        self._wait_for_rate_limit()
-
-        response = requests.get(
-            url,
+        response = self._get(
+            url=url,
             params=params,
             headers=headers,
-            timeout=15,
         )
-
-        response.raise_for_status()
 
         data = response.json()
 
@@ -136,16 +169,11 @@ class SemanticScholarService:
                 settings.SEMANTIC_SCHOLAR_API_KEY
             )
 
-        self._wait_for_rate_limit()
-
-        response = requests.get(
-            url,
+        response = self._get(
+            url=url,
             params=params,
             headers=headers,
-            timeout=15,
         )
-
-        response.raise_for_status()
 
         data = response.json()
 
