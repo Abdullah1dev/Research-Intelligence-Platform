@@ -44,6 +44,15 @@ from app.features.papers.service import (
     analyze_paper,
 )
 
+from app.features.papers.recommendation_service import (
+    PaperRecommendationService,
+)
+
+from app.infrastructure.external_apis.semantic_scholar.service import (
+    SemanticScholarService,
+)
+
+
 
 router = APIRouter(
     prefix="/papers",
@@ -306,4 +315,27 @@ def analyze_paper_endpoint(
         db=db,
         paper_id=paper_id,
         current_user=current_user,
+    )
+    
+
+#Semantic Scholar endpoint
+@router.get(
+    "/{paper_id}/recommendations",
+)
+def get_paper_recommendations(
+    paper_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    semantic_scholar = SemanticScholarService()
+
+    recommendation_service = PaperRecommendationService(
+        semantic_scholar=semantic_scholar,
+    )
+
+    return recommendation_service.get_recommendations(
+        db=db,
+        paper_id=paper_id,
+        user_id=current_user.id,
+        limit=5,
     )

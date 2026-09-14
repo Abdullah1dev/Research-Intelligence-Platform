@@ -95,6 +95,13 @@ class Paper(Base):
     back_populates="paper",
     cascade="all, delete-orphan",
     )
+    
+    semantic_scholar_id: Mapped[str | None] = mapped_column(
+    String(255),
+    unique=True,
+    nullable=True
+    )
+    
 
 
 

@@ -20,7 +20,9 @@ class Settings(BaseSettings):
 
     # OpenRouter
     OPENROUTER_API_KEY: str
-
+    
+    # Semantic Scholar
+    SEMANTIC_SCHOLAR_API_KEY: str | None = None
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore",
