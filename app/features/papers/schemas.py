@@ -33,9 +33,9 @@ class PaperCreate(BaseModel):
         max_length=255
     )
 
-    doi: str = Field(
-        min_length=1,
-        max_length=255
+    doi: str | None = Field(
+    default=None,
+    max_length=255
     )
 
     category: str = Field(
@@ -43,7 +43,7 @@ class PaperCreate(BaseModel):
         max_length=100
     )
 
-    pdf_url: HttpUrl
+    pdf_url: HttpUrl | None = None
 
 
 
@@ -101,9 +101,9 @@ class PaperUpdate(BaseModel):
         max_length=255
     )
 
-    doi: str = Field(
-        min_length=1,
-        max_length=255
+    doi: str | None = Field(
+    default=None,
+    max_length=255
     )
 
     category: str = Field(
@@ -111,7 +111,7 @@ class PaperUpdate(BaseModel):
         max_length=100
     )
 
-    pdf_url: HttpUrl
+    pdf_url: HttpUrl | None = None
     
     
 

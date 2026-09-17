@@ -1,27 +1,31 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.features.auth.schemas import RegisterRequest, RegisterResponse
-from app.features.auth.service import register_user
-from app.infrastructure.database.config import get_db
-
-from fastapi import HTTPException, status
-from app.shared.security.jwt import create_access_token
-
-
-
-
-from fastapi import Depends
-
-from app.features.users.models import User
-from app.shared.enums.roles import UserRole
-from app.shared.security.authorization import require_roles
-
 from app.features.auth.schemas import (
+    RegisterRequest,
+    RegisterResponse,
     LoginRequest,
     LoginResponse,
+    CurrentUserResponse,
 )
-from app.features.auth.service import authenticate_user
+
+from app.features.auth.service import (
+    register_user,
+    authenticate_user,
+)
+
+from app.infrastructure.database.config import get_db
+
+from app.shared.security.jwt import create_access_token
+
+from app.features.users.models import User
+
+from app.shared.enums.roles import UserRole
+
+from app.shared.security.authorization import (
+    require_roles,
+    get_current_user,
+)
 
 
 router = APIRouter(
@@ -47,15 +51,12 @@ def register(
             status_code=status.HTTP_409_CONFLICT,
             detail=str(error),
         )
-        
-    
 
-#login
+
 @router.post(
     "/login",
     response_model=LoginResponse,
 )
-
 def login(
     data: LoginRequest,
     db: Session = Depends(get_db),
@@ -65,7 +66,7 @@ def login(
 
         access_token = create_access_token(
             {
-                "sub": str(user.id)
+                "sub": str(user.id),
             }
         )
 
@@ -74,25 +75,30 @@ def login(
             token_type="bearer",
         )
 
-    except ValueError as e:
+    except ValueError as error:
         raise HTTPException(
-            status_code=401,
-            detail=str(e),
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=str(error),
         )
 
-    
+
+@router.get(
+    "/me",
+    response_model=CurrentUserResponse,
+)
+def get_me(
+    current_user: User = Depends(get_current_user),
+):
+    return current_user
 
 
 @router.get("/admin-test")
 def admin_test(
     current_user: User = Depends(
-        require_roles(UserRole.ADMIN)
+        require_roles(UserRole.ADMIN),
     ),
 ):
     return {
         "message": "You are an admin",
         "user": current_user.name,
     }
-    
-    
-

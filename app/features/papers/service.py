@@ -61,11 +61,9 @@ def create_paper(
         journal=data.journal,
         doi=data.doi,
         category=data.category,
-        pdf_url=str(data.pdf_url),
+        pdf_url=str(data.pdf_url) if data.pdf_url else None,
         owner_id=owner_id,
     )
-
-    
 
     db.add(paper)
 

@@ -1,10 +1,24 @@
+from datetime import datetime
+
 from pydantic import BaseModel, Field
+
+from app.shared.enums.roles import UserRole
 
 
 class RegisterRequest(BaseModel):
-    name: str = Field(min_length=2, max_length=100)
-    email: str = Field(max_length=255)
-    password: str = Field(min_length=8, max_length=128)
+    name: str = Field(
+        min_length=2,
+        max_length=100,
+    )
+
+    email: str = Field(
+        max_length=255,
+    )
+
+    password: str = Field(
+        min_length=8,
+        max_length=128,
+    )
 
 
 class RegisterResponse(BaseModel):
@@ -12,16 +26,29 @@ class RegisterResponse(BaseModel):
     name: str
     email: str
     is_active: bool
-    
-    
+
+
 class LoginRequest(BaseModel):
-    email: str = Field(max_length=255)
-    password: str = Field(min_length=8 , max_length=128)
-    
+    email: str = Field(
+        max_length=255,
+    )
+
+    password: str = Field(
+        min_length=8,
+        max_length=128,
+    )
 
 
 class LoginResponse(BaseModel):
     access_token: str
     token_type: str
-    
-    
+
+
+class CurrentUserResponse(BaseModel):
+    id: int
+    name: str
+    email: str
+    is_active: bool
+    role: UserRole
+    created_at: datetime
+    updated_at: datetime
