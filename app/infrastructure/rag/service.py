@@ -8,6 +8,7 @@ from app.infrastructure.rag.models import (
     RetrievalSource,
 )
 
+
 class RAGService:
 
     def __init__(
@@ -19,8 +20,9 @@ class RAGService:
         self.vector_search_service = vector_search_service
         self.context_builder = context_builder
         self.llm_service = llm_service
-    
-    #Retrieveal method for only chunking and context building
+
+    # Retrieval method:
+    # responsible only for searching chunks and building context
     def retrieve(
         self,
         db: Session,
@@ -28,7 +30,7 @@ class RAGService:
         question: str,
         top_k: int = 4,
         similarity_threshold: float = 0.5,
-    ) -> dict:
+    ) -> RetrievalResult:
 
         # 1. Search for relevant chunks
         search_results = self.vector_search_service.search(
@@ -41,10 +43,10 @@ class RAGService:
 
         # 2. Stop if no relevant chunks were found
         if not search_results:
-            return {
-                "context": "",
-                "sources": [],
-            }
+            return RetrievalResult(
+                context="",
+                sources=[],
+            )
 
         # 3. Extract chunks
         chunks = [
@@ -57,13 +59,14 @@ class RAGService:
             chunks
         )
 
+        # 5. Stop if context could not be built
         if not context:
-            return {
-                "context": "",
-                "sources": [],
-            }
+            return RetrievalResult(
+                context="",
+                sources=[],
+            )
 
-        # 5. Prepare source information
+        # 6. Prepare source information
         sources = []
 
         for result in search_results:
@@ -76,18 +79,17 @@ class RAGService:
                     chunk_index=chunk.chunk_index,
                     content=chunk.content,
                     similarity_score=result["similarity_score"],
-                    
-                    )
                 )
+            )
 
-        # 6. Return retrieval result
+        # 7. Return structured retrieval result
         return RetrievalResult(
             context=context,
             sources=sources,
-            )
+        )
 
-
-    #Ask method for llm generation
+    # Ask method:
+    # responsible for retrieval + LLM generation
     def ask(
         self,
         db: Session,
@@ -116,9 +118,10 @@ class RAGService:
                 "sources": [],
             }
 
+        # 3. Get retrieved context
         context = retrieval.context
 
-        # 3. Build RAG prompt
+        # 4. Build grounded RAG prompt
         prompt = f"""
 You are a research paper assistant.
 
@@ -129,6 +132,7 @@ If the answer is not available in the context, say:
 "I could not find the answer in the provided document."
 
 Do not make up information.
+Do not use outside knowledge.
 
 Context:
 {context}
@@ -139,12 +143,12 @@ Question:
 Answer:
 """
 
-        # 4. Generate answer
+        # 5. Generate answer
         answer = self.llm_service.generate(
             prompt
         )
 
-        # 5. Return answer and sources
+        # 6. Return answer and sources
         return {
             "answer": answer,
             "sources": retrieval.sources,

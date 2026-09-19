@@ -26,6 +26,10 @@ from app.features.papers.models import (
 from app.infrastructure.llm.service import LLMService
 from app.infrastructure.analysis.service import AnalysisService
 
+from app.infrastructure.document_processing.pdf import PDFExtractor
+from app.infrastructure.document_processing.chunker import DocumentChunker
+from app.infrastructure.embeddings.service import EmbeddingService
+
 storage = LocalStorage()
 
 
@@ -557,7 +561,7 @@ async def replace_paper_document(
         db.query(Paper)
         .filter(
             Paper.id == paper_id,
-            Paper.owner_id == current_user.id
+            Paper.owner_id == current_user.id,
         )
         .first()
     )
@@ -565,13 +569,13 @@ async def replace_paper_document(
     if not paper:
         raise HTTPException(
             status_code=404,
-            detail="Paper not found"
+            detail="Paper not found",
         )
 
     document = (
         db.query(PaperDocument)
         .filter(
-            PaperDocument.paper_id == paper_id
+            PaperDocument.paper_id == paper_id,
         )
         .first()
     )
@@ -579,32 +583,130 @@ async def replace_paper_document(
     if not document:
         raise HTTPException(
             status_code=404,
-            detail="Document not found"
+            detail="Document not found",
         )
 
     old_storage_key = document.storage_key
+    new_storage_key = None
 
-    print("OLD STORAGE KEY:", old_storage_key)
+    try:
+        # 1. Save the new PDF
+        new_storage_key, new_file_size = await storage.save(
+            file=file,
+            folder=f"papers/{paper_id}",
+        )
 
-    new_storage_key, new_file_size = await storage.save(
-        file=file,
-        folder=f"papers/{paper_id}"
-    )
+        print("OLD STORAGE KEY:", old_storage_key)
+        print("NEW STORAGE KEY:", new_storage_key)
 
-    print("NEW STORAGE KEY:", new_storage_key)
+        # 2. Extract text from the new PDF
+        pdf_extractor = PDFExtractor()
 
-    document.file_name = file.filename
-    document.file_size = new_file_size
-    document.mime_type = file.content_type
-    document.storage_key = new_storage_key
-    document.updated_at = datetime.utcnow()
+        file_path = storage.get_path(
+            new_storage_key
+        )
 
-    db.commit()
-    db.refresh(document)
+        text = pdf_extractor.extract_text(
+            str(file_path)
+        )
 
-    print("DELETING OLD FILE:", old_storage_key)
+        # 3. Split text into chunks
+        chunker = DocumentChunker()
 
-    storage.delete(old_storage_key)
+        chunks = chunker.split_text(text)
+
+        if not chunks:
+            raise ValueError(
+                "No text could be extracted from the new PDF"
+            )
+
+        # 4. Generate embeddings
+        embedding_service = EmbeddingService()
+
+        embeddings = (
+            embedding_service.embed_documents(
+                chunks
+            )
+        )
+
+        if len(chunks) != len(embeddings):
+            raise ValueError(
+                "Number of embeddings does not match "
+                "number of chunks"
+            )
+
+        # 5. Delete old chunks and embeddings
+        db.query(DocumentChunk).filter(
+            DocumentChunk.document_id == document.id
+        ).delete(
+            synchronize_session=False
+        )
+
+        # 6. Add new chunks and embeddings
+        for index, (chunk, embedding) in enumerate(
+            zip(chunks, embeddings)
+        ):
+            document_chunk = DocumentChunk(
+                document_id=document.id,
+                chunk_index=index,
+                content=chunk,
+                embedding=embedding,
+            )
+
+            db.add(document_chunk)
+
+        # 7. Update document metadata
+        document.file_name = file.filename
+        document.file_size = new_file_size
+        document.mime_type = file.content_type
+        document.storage_key = new_storage_key
+        document.updated_at = datetime.utcnow()
+
+        # 8. Commit database changes
+        db.commit()
+
+        # 9. Delete the old PDF
+        storage.delete(old_storage_key)
+
+        db.refresh(document)
+
+        print(
+            "Document replaced successfully."
+        )
+
+        print(
+            "Extracted characters:",
+            len(text),
+        )
+
+        print(
+            "Total chunks:",
+            len(chunks),
+        )
+
+        print(
+            "Total embeddings:",
+            len(embeddings),
+        )
+
+        return document
+
+    except Exception as exc:
+
+        db.rollback()
+
+        # If the new file was successfully created,
+        # remove it because the replacement failed.
+        if new_storage_key:
+            try:
+                storage.delete(new_storage_key)
+            except Exception:
+                pass
+
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to replace document: {str(exc)}",
+        )
     
 
 
