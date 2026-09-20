@@ -1,0 +1,54 @@
+services:
+
+  postgres:
+    image: pgvector/pgvector:pg17
+
+    container_name: research-postgres
+
+    environment:
+      POSTGRES_DB: research_platform
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgre123
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U postgres -d research_platform"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+
+    container_name: research-backend
+
+    env_file:
+      - .env
+
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - ./storage:/app/storage
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+
+  postgres_data:
