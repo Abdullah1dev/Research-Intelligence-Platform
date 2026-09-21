@@ -1314,3 +1314,162 @@ The backend is ready to serve as the API layer for the platform's frontend and f
 This project is currently a personal/portfolio project.
 
 Add your preferred license here before making the repository public if you intend to distribute the source under a specific license.
+
+
+##Deployment
+
+🐳 Docker Deployment
+
+The project is distributed using pre-built Docker images, so you do not need to build the frontend or backend images yourself.
+
+The Docker Compose configuration automatically pulls the required images from Docker Hub.
+
+Prerequisites
+
+Install:
+
+Docker Desktop
+Git
+
+Make sure Docker Desktop is running before starting the application.
+
+1. Clone the Repository
+
+Clone the backend/main repository:
+
+git clone <YOUR-BACKEND-REPOSITORY-URL>
+cd "Research Intelligence Platform"
+2. Configure Environment Variables
+
+Create your local environment file from the example:
+
+cp .env.example .env
+
+On Windows PowerShell, you can use:
+
+Copy-Item .env.example .env
+
+Open .env and configure the required values.
+
+Example structure:
+
+APP_NAME=Research Intelligence Platform
+APP_VERSION=1.0.0
+DEBUG=True
+
+DATABASE_HOST=postgres
+DATABASE_PORT=5432
+DATABASE_NAME=research_platform
+DATABASE_USER=postgres
+DATABASE_PASSWORD=your_database_password
+
+OPENROUTER_API_KEY=your_openrouter_api_key
+SEMANTIC_SCHOLAR_API_KEY=your_semantic_scholar_api_key
+Important
+
+Never commit your real .env file to GitHub.
+
+Your API keys and database credentials should remain private.
+
+The repository should contain:
+
+.env.example
+
+but not:
+
+.env
+3. Start the Application
+
+Run:
+
+docker compose up -d
+
+Docker Compose will start:
+
+PostgreSQL
+FastAPI backend
+React frontend
+
+The backend and frontend images are pulled automatically from Docker Hub.
+
+4. Check Running Containers
+
+Run:
+
+docker ps
+
+You should see containers similar to:
+
+research-postgres
+research-backend
+research-intelligence-frontend
+
+The PostgreSQL container should become healthy before the backend starts using the database.
+
+5. Open the Application
+
+Once the containers are running, open:
+
+http://localhost:3000
+
+The FastAPI backend is available at:
+
+http://localhost:8000
+
+FastAPI Swagger documentation:
+
+http://localhost:8000/docs
+🔄 Managing the Application
+Stop the Application
+docker compose stop
+
+This stops the containers without removing them.
+
+Start Again
+docker compose start
+View Container Status
+docker ps
+View Backend Logs
+docker logs -f research-backend
+View Frontend Logs
+docker logs -f research-intelligence-frontend
+View PostgreSQL Logs
+docker logs -f research-postgres
+Stop and Remove Containers
+docker compose down
+⚠️ Database Warning
+
+Do not use:
+
+docker compose down -v
+
+unless you intentionally want to remove the Docker volume containing the PostgreSQL database.
+
+The PostgreSQL data is stored in a persistent Docker volume so that restarting the containers does not automatically remove the database.
+
+📁 Project Structure
+Research Intelligence Platform/
+│
+├── app/
+│   ├── config/
+│   ├── features/
+│   │   ├── auth/
+│   │   ├── papers/
+│   │   └── conversations/
+│   │
+│   ├── infrastructure/
+│   │   ├── agent/
+│   │   └── ...
+│   │
+│   └── main.py
+│
+├── storage/
+│
+├── Docs/
+│
+├── .dockerignore
+├── .env.example
+├── .gitignore
+├── Dockerfile
+├── docker-compose.yml
+└── README.md
