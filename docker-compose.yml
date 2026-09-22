@@ -8,10 +8,7 @@ services:
     environment:
       POSTGRES_DB: research_platform
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgre123
-
-    ports:
-      - "5432:5432"
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -26,9 +23,9 @@ services:
       timeout: 5s
       retries: 10
 
+
   backend:
-    build:
-      context: .
+    image: ranaabdullahtahir/research-intelligence-backend:latest
 
     container_name: research-backend
 
@@ -48,6 +45,19 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+
+  frontend:
+    image: ranaabdullahtahir/research-intelligence-frontend:latest
+
+    container_name: research-intelligence-frontend
+
+    ports:
+      - "3000:80"
+
+    depends_on:
+      - backend
+
 
 volumes:
 
