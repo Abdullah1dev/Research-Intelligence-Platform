@@ -1,0 +1,72 @@
+[
+  {
+    "id": "Q1",
+    "question": "What is supervised learning?",
+    "document_id": 1,
+    "relevant_chunk_ids": [1, 2],
+    "answerable": true
+  },
+  {
+    "id": "Q2",
+    "question": "What is the main goal of supervised learning?",
+    "document_id": 1,
+    "relevant_chunk_ids": [2],
+    "answerable": true
+  },
+  {
+    "id": "Q3",
+    "question": "What is the difference between classification and regression in supervised learning?",
+    "document_id": 1,
+    "relevant_chunk_ids": [2],
+    "answerable": true
+  },
+  {
+    "id": "Q4",
+    "question": "What does a supervised training sample consist of?",
+    "document_id": 1,
+    "relevant_chunk_ids": [4],
+    "answerable": true
+  },
+  {
+    "id": "Q5",
+    "question": "How does the supervised learning system adjust its parameters during training?",
+    "document_id": 1,
+    "relevant_chunk_ids": [4],
+    "answerable": true
+  },
+  {
+    "id": "Q6",
+    "question": "Why does achieving a low training error not necessarily mean good performance on unseen data?",
+    "document_id": 1,
+    "relevant_chunk_ids": [5],
+    "answerable": true
+  },
+  {
+    "id": "Q7",
+    "question": "What does generalizability mean in supervised learning?",
+    "document_id": 1,
+    "relevant_chunk_ids": [5, 6],
+    "answerable": true
+  },
+  {
+    "id": "Q8",
+    "question": "What approaches are mentioned for designing supervised learning systems?",
+    "document_id": 1,
+    "relevant_chunk_ids": [7],
+    "answerable": true
+  },
+  {
+    "id": "Q9",
+    "question": "What programming language was used to implement the supervised learning algorithms discussed in this paper?",
+    "document_id": 1,
+    "relevant_chunk_ids": [],
+    "answerable": false
+  },
+  {
+    "id": "Q10",
+    "question": "What is the capital city of France?",
+    "document_id": 1,
+    "relevant_chunk_ids": [],
+    "answerable": false
+  }
+]
