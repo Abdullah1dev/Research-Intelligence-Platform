@@ -215,6 +215,7 @@ def get_document(
 @router.get(
     "/{paper_id}/document/download",
 )
+
 def download_document(
     paper_id: int,
     db: Session = Depends(get_db),

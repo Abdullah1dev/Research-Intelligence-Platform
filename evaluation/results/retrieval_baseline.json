@@ -1,0 +1,110 @@
+[
+  {
+    "question_id": "Q1",
+    "question": "What is supervised learning?",
+    "document_id": 1,
+    "expected_chunk_ids": [
+      1,
+      2
+    ],
+    "retrieved_chunk_ids": [],
+    "retrieved_sources": [],
+    "retrieval_latency_ms": 369.23
+  },
+  {
+    "question_id": "Q2",
+    "question": "What is the main goal of supervised learning?",
+    "document_id": 1,
+    "expected_chunk_ids": [
+      2
+    ],
+    "retrieved_chunk_ids": [],
+    "retrieved_sources": [],
+    "retrieval_latency_ms": 46.64
+  },
+  {
+    "question_id": "Q3",
+    "question": "What is the difference between classification and regression in supervised learning?",
+    "document_id": 1,
+    "expected_chunk_ids": [
+      2
+    ],
+    "retrieved_chunk_ids": [],
+    "retrieved_sources": [],
+    "retrieval_latency_ms": 51.46
+  },
+  {
+    "question_id": "Q4",
+    "question": "What does a supervised training sample consist of?",
+    "document_id": 1,
+    "expected_chunk_ids": [
+      4
+    ],
+    "retrieved_chunk_ids": [],
+    "retrieved_sources": [],
+    "retrieval_latency_ms": 43.13
+  },
+  {
+    "question_id": "Q5",
+    "question": "How does the supervised learning system adjust its parameters during training?",
+    "document_id": 1,
+    "expected_chunk_ids": [
+      4
+    ],
+    "retrieved_chunk_ids": [],
+    "retrieved_sources": [],
+    "retrieval_latency_ms": 44.67
+  },
+  {
+    "question_id": "Q6",
+    "question": "Why does achieving a low training error not necessarily mean good performance on unseen data?",
+    "document_id": 1,
+    "expected_chunk_ids": [
+      5
+    ],
+    "retrieved_chunk_ids": [],
+    "retrieved_sources": [],
+    "retrieval_latency_ms": 57.0
+  },
+  {
+    "question_id": "Q7",
+    "question": "What does generalizability mean in supervised learning?",
+    "document_id": 1,
+    "expected_chunk_ids": [
+      5,
+      6
+    ],
+    "retrieved_chunk_ids": [],
+    "retrieved_sources": [],
+    "retrieval_latency_ms": 49.55
+  },
+  {
+    "question_id": "Q8",
+    "question": "What approaches are mentioned for designing supervised learning systems?",
+    "document_id": 1,
+    "expected_chunk_ids": [
+      7
+    ],
+    "retrieved_chunk_ids": [],
+    "retrieved_sources": [],
+    "retrieval_latency_ms": 48.38
+  },
+  {
+    "question_id": "Q9",
+    "question": "What programming language was used to implement the supervised learning algorithms discussed in this paper?",
+    "document_id": 1,
+    "expected_chunk_ids": [],
+    "retrieved_chunk_ids": [],
+    "retrieved_sources": [],
+    "retrieval_latency_ms": 53.0
+  },
+  {
+    "question_id": "Q10",
+    "question": "What is the capital city of France?",
+    "document_id": 1,
+    "expected_chunk_ids": [],
+    "retrieved_chunk_ids": [],
+    "retrieved_sources": [],
+    "retrieval_latency_ms": 44.64
+  }
+]
