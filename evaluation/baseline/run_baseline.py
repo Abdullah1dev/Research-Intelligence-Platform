@@ -89,7 +89,7 @@ rows = db.execute(
     text("""
         SELECT id, document_id, chunk_index
         FROM document_chunks
-        WHERE document_id = 1
+        WHERE document_id = 30
         ORDER BY chunk_index
     """)
 ).fetchall()
