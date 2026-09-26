@@ -13,6 +13,7 @@ from app.features.conversations.models import Conversation
 
 from app.infrastructure.database.config import SessionLocal
 from app.infrastructure.rag.dependencies import rag_service
+
 from sqlalchemy import text
 
 
@@ -65,8 +66,6 @@ RESULTS_DIR.mkdir(
 
 db = SessionLocal()
 
-from sqlalchemy import text
-
 print(
     "Connected database:",
     db.execute(
@@ -75,15 +74,20 @@ print(
 )
 
 print(
-    "Document 1 chunks:",
+    "Document 30 chunks:",
     db.execute(
         text("""
             SELECT COUNT(*)
             FROM document_chunks
-            WHERE document_id = 1
+            WHERE document_id = 30
         """)
     ).scalar(),
 )
+
+
+# --------------------------------------------------
+# Inspect document chunks
+# --------------------------------------------------
 
 rows = db.execute(
     text("""
@@ -94,11 +98,18 @@ rows = db.execute(
     """)
 ).fetchall()
 
-print("Chunk rows:")
+print("\nChunk rows:")
+
 for row in rows:
     print(row)
 
+
+# --------------------------------------------------
+# Store baseline results
+# --------------------------------------------------
+
 results = []
+
 
 try:
 
@@ -108,7 +119,7 @@ try:
         question = item["question"]
         document_id = item["document_id"]
 
-        expected_chunk_ids = item[
+        expected_chunk_indexes = item[
             "relevant_chunk_ids"
         ]
 
@@ -116,6 +127,7 @@ try:
         print("Question:", question_id)
         print("Text:", question)
         print("====================================")
+
 
         # ------------------------------------------
         # Measure retrieval latency
@@ -137,6 +149,7 @@ try:
             end_time - start_time
         ) * 1000
 
+
         # ------------------------------------------
         # Extract retrieved sources
         # ------------------------------------------
@@ -147,18 +160,30 @@ try:
 
             retrieved_sources.append(
                 {
+                    # Database primary key
                     "chunk_id": source.chunk_id,
+
+                    # Chunk position inside document
+                    # This is what we use for evaluation
                     "chunk_index": source.chunk_index,
+
+                    # Vector similarity
                     "similarity_score": (
                         source.similarity_score
                     ),
                 }
             )
 
-        retrieved_chunk_ids = [
-            source["chunk_id"]
+
+        # ------------------------------------------
+        # Extract chunk indexes
+        # ------------------------------------------
+
+        retrieved_chunk_indexes = [
+            source["chunk_index"]
             for source in retrieved_sources
         ]
+
 
         # ------------------------------------------
         # Store result
@@ -168,15 +193,23 @@ try:
             "question_id": question_id,
             "question": question,
             "document_id": document_id,
-            "expected_chunk_ids": (
-                expected_chunk_ids
+
+            # Ground truth
+            "expected_chunk_indexes": (
+                expected_chunk_indexes
             ),
-            "retrieved_chunk_ids": (
-                retrieved_chunk_ids
+
+            # Retrieved chunk indexes
+            "retrieved_chunk_indexes": (
+                retrieved_chunk_indexes
             ),
+
+            # Full retrieval information
             "retrieved_sources": (
                 retrieved_sources
             ),
+
+            # Retrieval latency
             "retrieval_latency_ms": round(
                 latency_ms,
                 2,
@@ -185,23 +218,27 @@ try:
 
         results.append(result)
 
+
         # ------------------------------------------
         # Console output
         # ------------------------------------------
 
         print(
             "Expected chunks:",
-            expected_chunk_ids,
+            expected_chunk_indexes,
         )
 
         print(
             "Retrieved chunks:",
-            retrieved_chunk_ids,
+            retrieved_chunk_indexes,
         )
 
         print(
             "Latency:",
-            round(latency_ms, 2),
+            round(
+                latency_ms,
+                2,
+            ),
             "ms",
         )
 
@@ -229,7 +266,9 @@ with open(
 
 
 print("\n====================================")
-print("Baseline retrieval evaluation complete.")
+print(
+    "Baseline retrieval evaluation complete."
+)
 print("Results saved to:")
 print(RESULTS_PATH)
 print("====================================")

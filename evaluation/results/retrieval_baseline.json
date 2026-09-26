@@ -3,15 +3,15 @@
     "question_id": "Q1",
     "question": "What is supervised learning?",
     "document_id": 30,
-    "expected_chunk_ids": [
+    "expected_chunk_indexes": [
       1,
       2
     ],
-    "retrieved_chunk_ids": [
-      2164,
-      2165,
-      2174,
-      2173
+    "retrieved_chunk_indexes": [
+      0,
+      1,
+      10,
+      9
     ],
     "retrieved_sources": [
       {
@@ -35,20 +35,20 @@
         "similarity_score": 0.7785
       }
     ],
-    "retrieval_latency_ms": 423.41
+    "retrieval_latency_ms": 734.18
   },
   {
     "question_id": "Q2",
     "question": "What is the main goal of supervised learning?",
     "document_id": 30,
-    "expected_chunk_ids": [
+    "expected_chunk_indexes": [
       2
     ],
-    "retrieved_chunk_ids": [
-      2165,
-      2164,
-      2173,
-      2174
+    "retrieved_chunk_indexes": [
+      1,
+      0,
+      9,
+      10
     ],
     "retrieved_sources": [
       {
@@ -72,20 +72,20 @@
         "similarity_score": 0.7625
       }
     ],
-    "retrieval_latency_ms": 51.97
+    "retrieval_latency_ms": 52.79
   },
   {
     "question_id": "Q3",
     "question": "What is the difference between classification and regression in supervised learning?",
     "document_id": 30,
-    "expected_chunk_ids": [
+    "expected_chunk_indexes": [
       2
     ],
-    "retrieved_chunk_ids": [
-      2165,
-      2164,
-      2171,
-      2166
+    "retrieved_chunk_indexes": [
+      1,
+      0,
+      7,
+      2
     ],
     "retrieved_sources": [
       {
@@ -109,20 +109,20 @@
         "similarity_score": 0.7379
       }
     ],
-    "retrieval_latency_ms": 58.66
+    "retrieval_latency_ms": 57.97
   },
   {
     "question_id": "Q4",
     "question": "What does a supervised training sample consist of?",
     "document_id": 30,
-    "expected_chunk_ids": [
+    "expected_chunk_indexes": [
       4
     ],
-    "retrieved_chunk_ids": [
-      2164,
-      2165,
-      2167,
-      2168
+    "retrieved_chunk_indexes": [
+      0,
+      1,
+      3,
+      4
     ],
     "retrieved_sources": [
       {
@@ -146,20 +146,20 @@
         "similarity_score": 0.7138
       }
     ],
-    "retrieval_latency_ms": 47.51
+    "retrieval_latency_ms": 51.96
   },
   {
     "question_id": "Q5",
     "question": "How does the supervised learning system adjust its parameters during training?",
     "document_id": 30,
-    "expected_chunk_ids": [
+    "expected_chunk_indexes": [
       4
     ],
-    "retrieved_chunk_ids": [
-      2165,
-      2168,
-      2173,
-      2167
+    "retrieved_chunk_indexes": [
+      1,
+      4,
+      9,
+      3
     ],
     "retrieved_sources": [
       {
@@ -183,20 +183,20 @@
         "similarity_score": 0.7498
       }
     ],
-    "retrieval_latency_ms": 64.7
+    "retrieval_latency_ms": 51.47
   },
   {
     "question_id": "Q6",
     "question": "Why does achieving a low training error not necessarily mean good performance on unseen data?",
     "document_id": 30,
-    "expected_chunk_ids": [
+    "expected_chunk_indexes": [
       5
     ],
-    "retrieved_chunk_ids": [
-      2168,
-      2170,
-      2171,
-      2169
+    "retrieved_chunk_indexes": [
+      4,
+      6,
+      7,
+      5
     ],
     "retrieved_sources": [
       {
@@ -220,21 +220,21 @@
         "similarity_score": 0.7082
       }
     ],
-    "retrieval_latency_ms": 82.33
+    "retrieval_latency_ms": 52.46
   },
   {
     "question_id": "Q7",
     "question": "What does generalizability mean in supervised learning?",
     "document_id": 30,
-    "expected_chunk_ids": [
+    "expected_chunk_indexes": [
       5,
       6
     ],
-    "retrieved_chunk_ids": [
-      2169,
-      2168,
-      2165,
-      2164
+    "retrieved_chunk_indexes": [
+      5,
+      4,
+      1,
+      0
     ],
     "retrieved_sources": [
       {
@@ -258,20 +258,20 @@
         "similarity_score": 0.7141
       }
     ],
-    "retrieval_latency_ms": 91.28
+    "retrieval_latency_ms": 53.71
   },
   {
     "question_id": "Q8",
     "question": "What approaches are mentioned for designing supervised learning systems?",
     "document_id": 30,
-    "expected_chunk_ids": [
+    "expected_chunk_indexes": [
       7
     ],
-    "retrieved_chunk_ids": [
-      2173,
-      2174,
-      2165,
-      2171
+    "retrieved_chunk_indexes": [
+      9,
+      10,
+      1,
+      7
     ],
     "retrieved_sources": [
       {
@@ -295,18 +295,18 @@
         "similarity_score": 0.7766
       }
     ],
-    "retrieval_latency_ms": 241.22
+    "retrieval_latency_ms": 49.89
   },
   {
     "question_id": "Q9",
     "question": "What programming language was used to implement the supervised learning algorithms discussed in this paper?",
     "document_id": 30,
-    "expected_chunk_ids": [],
-    "retrieved_chunk_ids": [
-      2173,
-      2174,
-      2164,
-      2165
+    "expected_chunk_indexes": [],
+    "retrieved_chunk_indexes": [
+      9,
+      10,
+      0,
+      1
     ],
     "retrieved_sources": [
       {
@@ -330,15 +330,15 @@
         "similarity_score": 0.7644
       }
     ],
-    "retrieval_latency_ms": 46.83
+    "retrieval_latency_ms": 49.45
   },
   {
     "question_id": "Q10",
     "question": "What is the capital city of France?",
     "document_id": 30,
-    "expected_chunk_ids": [],
-    "retrieved_chunk_ids": [],
+    "expected_chunk_indexes": [],
+    "retrieved_chunk_indexes": [],
     "retrieved_sources": [],
-    "retrieval_latency_ms": 47.38
+    "retrieval_latency_ms": 47.37
   }
 ]
