@@ -139,7 +139,7 @@ try:
             db=db,
             document_id=document_id,
             question=question,
-            top_k=4,
+            top_k=10,
             similarity_threshold=0.5,
         )
 

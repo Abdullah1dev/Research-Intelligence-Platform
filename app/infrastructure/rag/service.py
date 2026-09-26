@@ -28,7 +28,7 @@ class RAGService:
         db: Session,
         document_id: int,
         question: str,
-        top_k: int = 4,
+        top_k: int = 10,
         similarity_threshold: float = 0.5,
     ) -> RetrievalResult:
 
