@@ -26,6 +26,16 @@ BASELINE_PATH = (
     / "retrieval_baseline.json"
 )
 
+RERANKED_RESULTS_PATH = (
+    BASE_DIR
+    / "results"
+    / "retrieval_reranked.json"
+)
+
+
+reranked_results = []
+
+
 
 # ============================================================
 # LOAD BASELINE RESULTS
@@ -158,12 +168,29 @@ try:
         # Check whether valid pairs exist
         # ----------------------------------------------------
 
-        if not pairs:
-
-            print("No valid chunks found.")
+        if not retrieved_sources:
+            print("No candidates retrieved.")
             print("Skipping reranking.")
 
-            continue
+      
+
+        reranked_results.append(
+            {
+                "question_id": question_id,
+                "question": question,
+                "document_id": result["document_id"],
+                "expected_chunk_indexes": result[
+                    "expected_chunk_indexes"
+                ],
+                "retrieved_chunk_indexes": [],
+                "retrieved_sources": [],
+                "retrieval_latency_ms": result[
+                    "retrieval_latency_ms"
+                ],
+            }
+        )
+
+        continue
 
         # ====================================================
         # RERANK
@@ -229,6 +256,26 @@ try:
             ],
             reverse=True,
         )
+        
+        
+        reranked_results.append(
+    {
+        "question_id": question_id,
+        "question": question,
+        "document_id": result["document_id"],
+        "expected_chunk_indexes": result[
+            "expected_chunk_indexes"
+        ],
+        "retrieved_chunk_indexes": [
+            item["chunk_index"]
+            for item in reranked
+        ],
+        "retrieved_sources": reranked,
+        "retrieval_latency_ms": result[
+            "retrieval_latency_ms"
+            ],
+        }
+    )
 
         # ====================================================
         # RERANKED RANKING
@@ -256,6 +303,19 @@ finally:
     db.close()
 
 
+with open(
+    RERANKED_RESULTS_PATH,
+    "w",
+    encoding="utf-8",
+) as file:
+    json.dump(
+        reranked_results,
+        file,
+        indent=2,
+    )
+
+
 print("\n====================================")
-print("Standalone reranker test complete.")
+print("Reranked results saved to:")
+print(RERANKED_RESULTS_PATH)
 print("====================================")
