@@ -18,118 +18,125 @@ from app.infrastructure.database.config import SessionLocal
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-BASELINE_PATH = (
-    BASE_DIR
-    / "results"
-    / "retrieval_baseline.json"
-)
-
-RERANKED_PATH = (
-    BASE_DIR
-    / "results"
-    / "retrieval_reranked.json"
-)
+DATASET_PATH = BASE_DIR / "datasets" / "research_questions.json"
+BASELINE_PATH = BASE_DIR / "results" / "retrieval_baseline.json"
+RERANKED_PATH = BASE_DIR / "results" / "retrieval_reranked.json"
 
 
 # ============================================================
-# Load results
+# Load files
 # ============================================================
 
-with open(
-    BASELINE_PATH,
-    "r",
-    encoding="utf-8",
-) as file:
+with open(DATASET_PATH, "r", encoding="utf-8") as file:
+    questions = json.load(file)
+
+with open(BASELINE_PATH, "r", encoding="utf-8") as file:
     baseline_results = json.load(file)
 
-
-with open(
-    RERANKED_PATH,
-    "r",
-    encoding="utf-8",
-) as file:
+with open(RERANKED_PATH, "r", encoding="utf-8") as file:
     reranked_results = json.load(file)
 
 
 # ============================================================
-# Get Q4
+# Show compact overview
 # ============================================================
 
-baseline_q4 = next(
-    item
-    for item in baseline_results
-    if item["question_id"] == "Q4"
+print("\n" + "=" * 70)
+print("RETRIEVAL / RERANKING OVERVIEW")
+print("=" * 70)
+
+for question in questions:
+
+    question_id = question["id"]
+
+    if question_id not in {
+        "Q1", "Q2", "Q3", "Q4",
+        "Q5", "Q6", "Q7", "Q8"
+    }:
+        continue
+
+    baseline = next(
+        item for item in baseline_results
+        if item["question_id"] == question_id
+    )
+
+    reranked = next(
+        item for item in reranked_results
+        if item["question_id"] == question_id
+    )
+
+    baseline_indexes = [
+        item["chunk_index"]
+        for item in baseline["retrieved_sources"]
+    ]
+
+    reranked_indexes = [
+        item["chunk_index"]
+        for item in reranked["retrieved_sources"]
+    ]
+
+    print(f"\n{question_id}: {question['question']}")
+    print(f"GT:       {question.get('relevant_chunk_ids', [])}")
+    print(f"Baseline: {baseline_indexes}")
+    print(f"Reranked: {reranked_indexes}")
+
+
+# ============================================================
+# Select question
+# ============================================================
+
+question_id = input(
+    "\n\nEnter question to inspect (Q1-Q8): "
+).strip().upper()
+
+selected_question = next(
+    (
+        question
+        for question in questions
+        if question["id"] == question_id
+    ),
+    None,
 )
 
-reranked_q4 = next(
-    item
-    for item in reranked_results
-    if item["question_id"] == "Q4"
-)
+if selected_question is None:
+    print("Invalid question.")
+    raise SystemExit
 
 
-question = baseline_q4["question"]
-
-expected_indexes = baseline_q4[
-    "expected_chunk_indexes"
-]
-
-
-print("\n============================================")
-print("RERANKING INSPECTION — Q4")
-print("============================================")
+# ============================================================
+# Select chunks
+# ============================================================
 
 print("\nQuestion:")
-print(question)
+print(selected_question["question"])
 
-print("\nExpected relevant chunk indexes:")
-print(expected_indexes)
+print("\nCurrent Ground Truth:")
+print(selected_question.get("relevant_chunk_ids", []))
 
+chunk_input = input(
+    "\nEnter chunk indexes to inspect "
+    "(example: 3,4): "
+).strip()
 
-# ============================================================
-# Reranked lookup
-# ============================================================
-
-reranked_by_id = {
-    item["chunk_id"]: item
-    for item in reranked_q4["retrieved_sources"]
-}
-
-
-# ============================================================
-# Get top 5 from each ranking
-# ============================================================
-
-baseline_top_5 = (
-    baseline_q4["retrieved_sources"][:5]
-)
-
-reranked_top_5 = (
-    reranked_q4["retrieved_sources"][:5]
-)
+try:
+    chunk_indexes = [
+        int(index.strip())
+        for index in chunk_input.split(",")
+    ]
+except ValueError:
+    print("Invalid chunk indexes.")
+    raise SystemExit
 
 
 # ============================================================
-# Collect chunk IDs
+# Get document ID
 # ============================================================
 
-chunk_ids = set()
-
-for source in baseline_top_5:
-    chunk_ids.add(source["chunk_id"])
-
-for source in reranked_top_5:
-    chunk_ids.add(source["chunk_id"])
-
-# Also include the expected relevant chunk(s)
-for source in baseline_q4["retrieved_sources"]:
-
-    if source["chunk_index"] in expected_indexes:
-        chunk_ids.add(source["chunk_id"])
+document_id = selected_question["document_id"]
 
 
 # ============================================================
-# Fetch chunks
+# Query chunks
 # ============================================================
 
 db = SessionLocal()
@@ -139,185 +146,29 @@ try:
     chunks = (
         db.query(DocumentChunk)
         .filter(
-            DocumentChunk.id.in_(chunk_ids)
+            DocumentChunk.document_id == document_id,
+            DocumentChunk.chunk_index.in_(chunk_indexes),
         )
+        .order_by(DocumentChunk.chunk_index)
         .all()
     )
 
-    chunks_by_id = {
-        chunk.id: chunk
-        for chunk in chunks
-    }
+    # ========================================================
+    # Display chunks
+    # ========================================================
 
-finally:
+    print("\n" + "=" * 70)
+    print("CHUNK CONTENT")
+    print("=" * 70)
 
-    db.close()
+    for chunk in chunks:
 
+        print("\n" + "-" * 70)
+        print(f"Chunk index: {chunk.chunk_index}")
+        print(f"Chunk ID: {chunk.id}")
+        print("-" * 70)
 
-# ============================================================
-# Helper function
-# ============================================================
-
-def print_chunk(
-    rank,
-    source,
-    show_rerank=False,
-):
-
-    chunk_id = source["chunk_id"]
-    chunk_index = source["chunk_index"]
-
-    chunk = chunks_by_id.get(chunk_id)
-
-    print("\n--------------------------------------------")
-
-    print(f"Rank: {rank}")
-    print(f"Chunk index: {chunk_index}")
-    print(f"Chunk ID: {chunk_id}")
-
-    print(
-        f"Vector similarity: "
-        f"{source.get('similarity_score', 'N/A')}"
-    )
-
-    if show_rerank:
-
-        print(
-            f"Rerank score: "
-            f"{source.get('rerank_score', 'N/A')}"
-        )
-
-    if chunk_index in expected_indexes:
-
-        print(
-            ">>> EXPECTED RELEVANT CHUNK <<<"
-        )
-
-    if chunk is None:
-
-        print(
-            "ERROR: Chunk not found in database."
-        )
-
-        return
-
-    print("\nCONTENT:")
-    print(chunk.content)
-
-
-# ============================================================
-# Vector search ranking
-# ============================================================
-
-print("\n\n============================================")
-print("TOP 5 — VECTOR SEARCH")
-print("============================================")
-
-for rank, source in enumerate(
-    baseline_top_5,
-    start=1,
-):
-
-    print_chunk(
-        rank,
-        source,
-        show_rerank=False,
-    )
-
-
-# ============================================================
-# Reranker ranking
-# ============================================================
-
-print("\n\n============================================")
-print("TOP 5 — RERANKER")
-print("============================================")
-
-for rank, source in enumerate(
-    reranked_top_5,
-    start=1,
-):
-
-    print_chunk(
-        rank,
-        source,
-        show_rerank=True,
-    )
-
-
-# ============================================================
-# Expected relevant chunk
-# ============================================================
-
-print("\n\n============================================")
-print("EXPECTED RELEVANT CHUNK(S)")
-print("============================================")
-
-for source in baseline_q4["retrieved_sources"]:
-
-    if source["chunk_index"] not in expected_indexes:
-        continue
-
-    chunk_index = source["chunk_index"]
-    chunk_id = source["chunk_id"]
-
-    print("\n--------------------------------------------")
-
-    print(
-        f"Chunk index: {chunk_index}"
-    )
-
-    print(
-        f"Chunk ID: {chunk_id}"
-    )
-
-    # Vector rank
-    vector_rank = (
-        baseline_q4[
-            "retrieved_chunk_indexes"
-        ].index(chunk_index) + 1
-    )
-
-    print(
-        f"Vector rank: {vector_rank}"
-    )
-
-    # Reranker rank
-    if chunk_index in reranked_q4[
-        "retrieved_chunk_indexes"
-    ]:
-
-        reranker_rank = (
-            reranked_q4[
-                "retrieved_chunk_indexes"
-            ].index(chunk_index) + 1
-        )
-
-        print(
-            f"Reranker rank: {reranker_rank}"
-        )
-
-    reranked_source = reranked_by_id.get(
-        chunk_id
-    )
-
-    if reranked_source:
-
-        print(
-            f"Rerank score: "
-            f"{reranked_source['rerank_score']}"
-        )
-
-    chunk = chunks_by_id.get(
-        chunk_id
-    )
-
-    if chunk:
-
-        print("\nCONTENT:")
         print(chunk.content)
 
-
-print("\n\n============================================")
-print("INSPECTION COMPLETE")
-print("============================================")
+finally:
+    db.close()
