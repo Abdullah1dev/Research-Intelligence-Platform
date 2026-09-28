@@ -23,13 +23,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 BASELINE_PATH = (
     BASE_DIR
     / "results"
-    / "retrieval_baseline.json"
+    / "retrieval_baseline_top5.json"
 )
 
 RERANKED_RESULTS_PATH = (
     BASE_DIR
     / "results"
-    / "retrieval_reranked.json"
+    / "retrieval_reranked_top5.json"
 )
 
 

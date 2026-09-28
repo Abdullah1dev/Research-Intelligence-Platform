@@ -33,8 +33,10 @@ RESULTS_DIR = BASE_DIR / "results"
 
 RESULTS_PATH = (
     RESULTS_DIR
-    / "retrieval_baseline.json"
+    / "retrieval_baseline_top5.json"
 )
+
+
 
 
 # --------------------------------------------------
@@ -108,6 +110,8 @@ for row in rows:
 # Store baseline results
 # --------------------------------------------------
 
+TOP_K = 5
+
 results = []
 
 
@@ -139,7 +143,7 @@ try:
             db=db,
             document_id=document_id,
             question=question,
-            top_k=10,
+            top_k=TOP_K,
             similarity_threshold=0.5,
         )
 

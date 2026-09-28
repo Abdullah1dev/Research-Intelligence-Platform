@@ -12,12 +12,7 @@
       1,
       10,
       9,
-      2,
-      7,
-      3,
-      6,
-      4,
-      5
+      2
     ],
     "retrieved_sources": [
       {
@@ -44,34 +39,9 @@
         "chunk_id": 2166,
         "chunk_index": 2,
         "similarity_score": 0.7594
-      },
-      {
-        "chunk_id": 2171,
-        "chunk_index": 7,
-        "similarity_score": 0.7578
-      },
-      {
-        "chunk_id": 2167,
-        "chunk_index": 3,
-        "similarity_score": 0.7249
-      },
-      {
-        "chunk_id": 2170,
-        "chunk_index": 6,
-        "similarity_score": 0.7149
-      },
-      {
-        "chunk_id": 2168,
-        "chunk_index": 4,
-        "similarity_score": 0.6732
-      },
-      {
-        "chunk_id": 2169,
-        "chunk_index": 5,
-        "similarity_score": 0.6617
       }
     ],
-    "retrieval_latency_ms": 423.53
+    "retrieval_latency_ms": 613.58
   },
   {
     "question_id": "Q2",
@@ -85,12 +55,7 @@
       0,
       9,
       10,
-      7,
-      6,
-      2,
-      3,
-      4,
-      5
+      7
     ],
     "retrieved_sources": [
       {
@@ -117,34 +82,9 @@
         "chunk_id": 2171,
         "chunk_index": 7,
         "similarity_score": 0.7489
-      },
-      {
-        "chunk_id": 2170,
-        "chunk_index": 6,
-        "similarity_score": 0.724
-      },
-      {
-        "chunk_id": 2166,
-        "chunk_index": 2,
-        "similarity_score": 0.7187
-      },
-      {
-        "chunk_id": 2167,
-        "chunk_index": 3,
-        "similarity_score": 0.7045
-      },
-      {
-        "chunk_id": 2168,
-        "chunk_index": 4,
-        "similarity_score": 0.6911
-      },
-      {
-        "chunk_id": 2169,
-        "chunk_index": 5,
-        "similarity_score": 0.6864
       }
     ],
-    "retrieval_latency_ms": 51.31
+    "retrieval_latency_ms": 105.86
   },
   {
     "question_id": "Q3",
@@ -158,12 +98,7 @@
       0,
       7,
       2,
-      9,
-      4,
-      6,
-      3,
-      10,
-      8
+      9
     ],
     "retrieved_sources": [
       {
@@ -190,34 +125,9 @@
         "chunk_id": 2173,
         "chunk_index": 9,
         "similarity_score": 0.7323
-      },
-      {
-        "chunk_id": 2168,
-        "chunk_index": 4,
-        "similarity_score": 0.7302
-      },
-      {
-        "chunk_id": 2170,
-        "chunk_index": 6,
-        "similarity_score": 0.7261
-      },
-      {
-        "chunk_id": 2167,
-        "chunk_index": 3,
-        "similarity_score": 0.7258
-      },
-      {
-        "chunk_id": 2174,
-        "chunk_index": 10,
-        "similarity_score": 0.7219
-      },
-      {
-        "chunk_id": 2172,
-        "chunk_index": 8,
-        "similarity_score": 0.6991
       }
     ],
-    "retrieval_latency_ms": 60.01
+    "retrieval_latency_ms": 361.79
   },
   {
     "question_id": "Q4",
@@ -231,12 +141,7 @@
       1,
       3,
       4,
-      2,
-      10,
-      9,
-      6,
-      7,
-      8
+      2
     ],
     "retrieved_sources": [
       {
@@ -263,34 +168,9 @@
         "chunk_id": 2166,
         "chunk_index": 2,
         "similarity_score": 0.7106
-      },
-      {
-        "chunk_id": 2174,
-        "chunk_index": 10,
-        "similarity_score": 0.7103
-      },
-      {
-        "chunk_id": 2173,
-        "chunk_index": 9,
-        "similarity_score": 0.6937
-      },
-      {
-        "chunk_id": 2170,
-        "chunk_index": 6,
-        "similarity_score": 0.6919
-      },
-      {
-        "chunk_id": 2171,
-        "chunk_index": 7,
-        "similarity_score": 0.6775
-      },
-      {
-        "chunk_id": 2172,
-        "chunk_index": 8,
-        "similarity_score": 0.6642
       }
     ],
-    "retrieval_latency_ms": 49.25
+    "retrieval_latency_ms": 489.11
   },
   {
     "question_id": "Q5",
@@ -304,12 +184,7 @@
       4,
       9,
       3,
-      6,
-      0,
-      7,
-      10,
-      2,
-      5
+      6
     ],
     "retrieved_sources": [
       {
@@ -336,34 +211,9 @@
         "chunk_id": 2170,
         "chunk_index": 6,
         "similarity_score": 0.7417
-      },
-      {
-        "chunk_id": 2164,
-        "chunk_index": 0,
-        "similarity_score": 0.7399
-      },
-      {
-        "chunk_id": 2171,
-        "chunk_index": 7,
-        "similarity_score": 0.7344
-      },
-      {
-        "chunk_id": 2174,
-        "chunk_index": 10,
-        "similarity_score": 0.731
-      },
-      {
-        "chunk_id": 2166,
-        "chunk_index": 2,
-        "similarity_score": 0.6943
-      },
-      {
-        "chunk_id": 2169,
-        "chunk_index": 5,
-        "similarity_score": 0.6872
       }
     ],
-    "retrieval_latency_ms": 57.01
+    "retrieval_latency_ms": 371.67
   },
   {
     "question_id": "Q6",
@@ -377,12 +227,7 @@
       6,
       7,
       5,
-      1,
-      3,
-      9,
-      8,
-      2,
-      0
+      1
     ],
     "retrieved_sources": [
       {
@@ -409,34 +254,9 @@
         "chunk_id": 2165,
         "chunk_index": 1,
         "similarity_score": 0.701
-      },
-      {
-        "chunk_id": 2167,
-        "chunk_index": 3,
-        "similarity_score": 0.6935
-      },
-      {
-        "chunk_id": 2173,
-        "chunk_index": 9,
-        "similarity_score": 0.6809
-      },
-      {
-        "chunk_id": 2172,
-        "chunk_index": 8,
-        "similarity_score": 0.6808
-      },
-      {
-        "chunk_id": 2166,
-        "chunk_index": 2,
-        "similarity_score": 0.6732
-      },
-      {
-        "chunk_id": 2164,
-        "chunk_index": 0,
-        "similarity_score": 0.635
       }
     ],
-    "retrieval_latency_ms": 249.21
+    "retrieval_latency_ms": 189.53
   },
   {
     "question_id": "Q7",
@@ -450,12 +270,7 @@
       4,
       1,
       0,
-      10,
-      6,
-      9,
-      2,
-      7,
-      3
+      10
     ],
     "retrieved_sources": [
       {
@@ -482,34 +297,9 @@
         "chunk_id": 2174,
         "chunk_index": 10,
         "similarity_score": 0.6984
-      },
-      {
-        "chunk_id": 2170,
-        "chunk_index": 6,
-        "similarity_score": 0.6928
-      },
-      {
-        "chunk_id": 2173,
-        "chunk_index": 9,
-        "similarity_score": 0.6859
-      },
-      {
-        "chunk_id": 2166,
-        "chunk_index": 2,
-        "similarity_score": 0.6817
-      },
-      {
-        "chunk_id": 2171,
-        "chunk_index": 7,
-        "similarity_score": 0.681
-      },
-      {
-        "chunk_id": 2167,
-        "chunk_index": 3,
-        "similarity_score": 0.6651
       }
     ],
-    "retrieval_latency_ms": 91.19
+    "retrieval_latency_ms": 128.39
   },
   {
     "question_id": "Q8",
@@ -523,12 +313,7 @@
       10,
       1,
       7,
-      6,
-      0,
-      3,
-      2,
-      4,
-      8
+      6
     ],
     "retrieved_sources": [
       {
@@ -555,34 +340,9 @@
         "chunk_id": 2170,
         "chunk_index": 6,
         "similarity_score": 0.759
-      },
-      {
-        "chunk_id": 2164,
-        "chunk_index": 0,
-        "similarity_score": 0.7486
-      },
-      {
-        "chunk_id": 2167,
-        "chunk_index": 3,
-        "similarity_score": 0.7187
-      },
-      {
-        "chunk_id": 2166,
-        "chunk_index": 2,
-        "similarity_score": 0.6992
-      },
-      {
-        "chunk_id": 2168,
-        "chunk_index": 4,
-        "similarity_score": 0.6685
-      },
-      {
-        "chunk_id": 2172,
-        "chunk_index": 8,
-        "similarity_score": 0.6653
       }
     ],
-    "retrieval_latency_ms": 81.3
+    "retrieval_latency_ms": 128.45
   },
   {
     "question_id": "Q9",
@@ -594,12 +354,7 @@
       10,
       0,
       1,
-      2,
-      7,
-      6,
-      3,
-      5,
-      4
+      2
     ],
     "retrieved_sources": [
       {
@@ -626,34 +381,9 @@
         "chunk_id": 2166,
         "chunk_index": 2,
         "similarity_score": 0.7572
-      },
-      {
-        "chunk_id": 2171,
-        "chunk_index": 7,
-        "similarity_score": 0.7535
-      },
-      {
-        "chunk_id": 2170,
-        "chunk_index": 6,
-        "similarity_score": 0.7376
-      },
-      {
-        "chunk_id": 2167,
-        "chunk_index": 3,
-        "similarity_score": 0.7149
-      },
-      {
-        "chunk_id": 2169,
-        "chunk_index": 5,
-        "similarity_score": 0.6863
-      },
-      {
-        "chunk_id": 2168,
-        "chunk_index": 4,
-        "similarity_score": 0.6693
       }
     ],
-    "retrieval_latency_ms": 94.1
+    "retrieval_latency_ms": 123.84
   },
   {
     "question_id": "Q10",
@@ -662,6 +392,6 @@
     "expected_chunk_indexes": [],
     "retrieved_chunk_indexes": [],
     "retrieved_sources": [],
-    "retrieval_latency_ms": 65.68
+    "retrieval_latency_ms": 105.27
   }
 ]
