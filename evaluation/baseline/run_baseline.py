@@ -160,14 +160,8 @@ try:
 
             retrieved_sources.append(
                 {
-                    # Database primary key
                     "chunk_id": source.chunk_id,
-
-                    # Chunk position inside document
-                    # This is what we use for evaluation
                     "chunk_index": source.chunk_index,
-
-                    # Vector similarity
                     "similarity_score": (
                         source.similarity_score
                     ),

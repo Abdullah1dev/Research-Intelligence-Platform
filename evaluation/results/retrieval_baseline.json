@@ -71,14 +71,14 @@
         "similarity_score": 0.6617
       }
     ],
-    "retrieval_latency_ms": 502.76
+    "retrieval_latency_ms": 423.53
   },
   {
     "question_id": "Q2",
     "question": "What is the main goal of supervised learning?",
     "document_id": 30,
     "expected_chunk_indexes": [
-      2
+      1
     ],
     "retrieved_chunk_indexes": [
       1,
@@ -144,14 +144,14 @@
         "similarity_score": 0.6864
       }
     ],
-    "retrieval_latency_ms": 271.09
+    "retrieval_latency_ms": 51.31
   },
   {
     "question_id": "Q3",
     "question": "What is the difference between classification and regression in supervised learning?",
     "document_id": 30,
     "expected_chunk_indexes": [
-      2
+      1
     ],
     "retrieved_chunk_indexes": [
       1,
@@ -217,7 +217,7 @@
         "similarity_score": 0.6991
       }
     ],
-    "retrieval_latency_ms": 83.9
+    "retrieval_latency_ms": 60.01
   },
   {
     "question_id": "Q4",
@@ -290,7 +290,7 @@
         "similarity_score": 0.6642
       }
     ],
-    "retrieval_latency_ms": 102.43
+    "retrieval_latency_ms": 49.25
   },
   {
     "question_id": "Q5",
@@ -363,14 +363,14 @@
         "similarity_score": 0.6872
       }
     ],
-    "retrieval_latency_ms": 73.65
+    "retrieval_latency_ms": 57.01
   },
   {
     "question_id": "Q6",
     "question": "Why does achieving a low training error not necessarily mean good performance on unseen data?",
     "document_id": 30,
     "expected_chunk_indexes": [
-      6
+      4
     ],
     "retrieved_chunk_indexes": [
       4,
@@ -436,7 +436,7 @@
         "similarity_score": 0.635
       }
     ],
-    "retrieval_latency_ms": 77.62
+    "retrieval_latency_ms": 249.21
   },
   {
     "question_id": "Q7",
@@ -509,15 +509,14 @@
         "similarity_score": 0.6651
       }
     ],
-    "retrieval_latency_ms": 97.58
+    "retrieval_latency_ms": 91.19
   },
   {
     "question_id": "Q8",
     "question": "What approaches are mentioned for designing supervised learning systems?",
     "document_id": 30,
     "expected_chunk_indexes": [
-      7,
-      8
+      7
     ],
     "retrieved_chunk_indexes": [
       9,
@@ -583,7 +582,7 @@
         "similarity_score": 0.6653
       }
     ],
-    "retrieval_latency_ms": 63.77
+    "retrieval_latency_ms": 81.3
   },
   {
     "question_id": "Q9",
@@ -654,7 +653,7 @@
         "similarity_score": 0.6693
       }
     ],
-    "retrieval_latency_ms": 66.74
+    "retrieval_latency_ms": 94.1
   },
   {
     "question_id": "Q10",
@@ -663,6 +662,6 @@
     "expected_chunk_indexes": [],
     "retrieved_chunk_indexes": [],
     "retrieved_sources": [],
-    "retrieval_latency_ms": 68.89
+    "retrieval_latency_ms": 65.68
   }
 ]

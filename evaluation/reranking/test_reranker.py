@@ -33,10 +33,6 @@ RERANKED_RESULTS_PATH = (
 )
 
 
-reranked_results = []
-
-
-
 # ============================================================
 # LOAD BASELINE RESULTS
 # ============================================================
@@ -71,6 +67,8 @@ print("Reranker loaded successfully.")
 
 db = SessionLocal()
 
+reranked_results = []
+
 
 try:
 
@@ -87,10 +85,12 @@ try:
             "retrieved_sources"
         ]
 
+
         print("\n====================================")
         print("Question:", question_id)
         print("Text:", question)
         print("====================================")
+
 
         # ----------------------------------------------------
         # Check whether vector search returned candidates
@@ -101,7 +101,27 @@ try:
             print("No candidates retrieved.")
             print("Skipping reranking.")
 
+            reranked_results.append(
+                {
+                    "question_id": question_id,
+                    "question": question,
+                    "document_id": result[
+                        "document_id"
+                    ],
+                    "expected_chunk_indexes": result[
+                        "expected_chunk_indexes"
+                    ],
+                    "retrieved_chunk_indexes": [],
+                    "retrieved_sources": [],
+                    "retrieval_latency_ms": result[
+                        "retrieval_latency_ms"
+                    ],
+                    "reranking_latency_ms": 0.0,
+                }
+            )
+
             continue
+
 
         # ----------------------------------------------------
         # Get chunk IDs from baseline results
@@ -111,6 +131,7 @@ try:
             source["chunk_id"]
             for source in retrieved_sources
         ]
+
 
         # ----------------------------------------------------
         # Fetch all chunks in ONE database query
@@ -124,6 +145,7 @@ try:
             .all()
         )
 
+
         # ----------------------------------------------------
         # Create lookup dictionary
         # ----------------------------------------------------
@@ -132,6 +154,7 @@ try:
             chunk.id: chunk
             for chunk in chunks
         }
+
 
         # ----------------------------------------------------
         # Build query-document pairs
@@ -155,6 +178,7 @@ try:
 
                 continue
 
+
             pairs.append(
                 [
                     question,
@@ -164,41 +188,38 @@ try:
 
             valid_sources.append(source)
 
+
         # ----------------------------------------------------
         # Check whether valid pairs exist
         # ----------------------------------------------------
 
-        if not retrieved_sources:
-            print("No candidates retrieved.")
-            print("Skipping reranking.")
+        if not pairs:
 
-      
+            print(
+                "No valid question-chunk pairs."
+            )
 
-        reranked_results.append(
-            {
-                "question_id": question_id,
-                "question": question,
-                "document_id": result["document_id"],
-                "expected_chunk_indexes": result[
-                    "expected_chunk_indexes"
-                ],
-                "retrieved_chunk_indexes": [],
-                "retrieved_sources": [],
-                "retrieval_latency_ms": result[
-                    "retrieval_latency_ms"
-                ],
-            }
-        )
+            reranked_results.append(
+                {
+                    "question_id": question_id,
+                    "question": question,
+                    "document_id": result[
+                        "document_id"
+                    ],
+                    "expected_chunk_indexes": result[
+                        "expected_chunk_indexes"
+                    ],
+                    "retrieved_chunk_indexes": [],
+                    "retrieved_sources": [],
+                    "retrieval_latency_ms": result[
+                        "retrieval_latency_ms"
+                    ],
+                    "reranking_latency_ms": 0.0,
+                }
+            )
 
-        continue
+            continue
 
-        # ====================================================
-        # RERANK
-        # ====================================================
-
-        scores = reranker.predict(
-            pairs
-        )
 
         # ====================================================
         # ORIGINAL VECTOR RANKING
@@ -217,6 +238,26 @@ try:
                 f"| Vector similarity: "
                 f"{source['similarity_score']:.4f}"
             )
+
+
+        # ====================================================
+        # RERANK
+        # ====================================================
+
+        import time
+
+        rerank_start = time.perf_counter()
+
+        scores = reranker.predict(
+            pairs
+        )
+
+        rerank_end = time.perf_counter()
+
+        reranking_latency_ms = (
+            rerank_end - rerank_start
+        ) * 1000
+
 
         # ====================================================
         # BUILD RERANKED RESULTS
@@ -246,6 +287,7 @@ try:
                 }
             )
 
+
         # ----------------------------------------------------
         # Sort by reranker score
         # ----------------------------------------------------
@@ -256,26 +298,37 @@ try:
             ],
             reverse=True,
         )
-        
-        
+
+
+        # ====================================================
+        # STORE RERANKED RESULT
+        # ====================================================
+
         reranked_results.append(
-    {
-        "question_id": question_id,
-        "question": question,
-        "document_id": result["document_id"],
-        "expected_chunk_indexes": result[
-            "expected_chunk_indexes"
-        ],
-        "retrieved_chunk_indexes": [
-            item["chunk_index"]
-            for item in reranked
-        ],
-        "retrieved_sources": reranked,
-        "retrieval_latency_ms": result[
-            "retrieval_latency_ms"
-            ],
-        }
-    )
+            {
+                "question_id": question_id,
+                "question": question,
+                "document_id": result[
+                    "document_id"
+                ],
+                "expected_chunk_indexes": result[
+                    "expected_chunk_indexes"
+                ],
+                "retrieved_chunk_indexes": [
+                    item["chunk_index"]
+                    for item in reranked
+                ],
+                "retrieved_sources": reranked,
+                "retrieval_latency_ms": result[
+                    "retrieval_latency_ms"
+                ],
+                "reranking_latency_ms": round(
+                    reranking_latency_ms,
+                    2,
+                ),
+            }
+        )
+
 
         # ====================================================
         # RERANKED RANKING
@@ -298,16 +351,31 @@ try:
             )
 
 
+        print(
+            "Reranking latency:",
+            round(
+                reranking_latency_ms,
+                2,
+            ),
+            "ms",
+        )
+
+
 finally:
 
     db.close()
 
+
+# ============================================================
+# SAVE RERANKED RESULTS
+# ============================================================
 
 with open(
     RERANKED_RESULTS_PATH,
     "w",
     encoding="utf-8",
 ) as file:
+
     json.dump(
         reranked_results,
         file,
