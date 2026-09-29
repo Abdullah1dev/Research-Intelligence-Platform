@@ -8,6 +8,7 @@ from app.infrastructure.rag.models import (
     RetrievalSource,
 )
 
+from app.infrastructure.rag.reranker import RerankerService
 
 class RAGService:
 
@@ -15,11 +16,15 @@ class RAGService:
         self,
         vector_search_service: VectorSearchService,
         context_builder: RAGContextBuilder,
+        reranker_service: RerankerService,
         llm_service: LLMService,
+        
+       
     ):
         self.vector_search_service = vector_search_service
         self.context_builder = context_builder
         self.llm_service = llm_service
+        self.reranker_service = reranker_service
 
     # Retrieval method:
     # responsible only for searching chunks and building context
@@ -28,7 +33,8 @@ class RAGService:
         db: Session,
         document_id: int,
         question: str,
-        top_k: int = 10,
+        retrieval_top_k: int = 10,
+        rerank_top_k: int = 4,
         similarity_threshold: float = 0.5,
     ) -> RetrievalResult:
 
@@ -37,12 +43,19 @@ class RAGService:
             db=db,
             document_id=document_id,
             query=question,
-            top_k=top_k,
+            top_k=retrieval_top_k,
             similarity_threshold=similarity_threshold,
+        )
+        
+        reranked_results = self.reranker_service.rerank(
+            question=question,
+            candidates=search_results,
+            top_k=rerank_top_k,
+        
         )
 
         # 2. Stop if no relevant chunks were found
-        if not search_results:
+        if not reranked_results:
             return RetrievalResult(
                 context="",
                 sources=[],
@@ -51,7 +64,7 @@ class RAGService:
         # 3. Extract chunks
         chunks = [
             result["chunk"]
-            for result in search_results
+            for result in reranked_results
         ]
 
         # 4. Build context
@@ -69,7 +82,7 @@ class RAGService:
         # 6. Prepare source information
         sources = []
 
-        for result in search_results:
+        for result in reranked_results:
 
             chunk = result["chunk"]
 
@@ -95,8 +108,10 @@ class RAGService:
         db: Session,
         document_id: int,
         question: str,
-        top_k: int = 4,
+        retrieval_top_k: int = 10,
+        rerank_top_k: int = 4,
         similarity_threshold: float = 0.5,
+    
     ) -> dict:
 
         # 1. Retrieve relevant information
@@ -104,10 +119,11 @@ class RAGService:
             db=db,
             document_id=document_id,
             question=question,
-            top_k=top_k,
+            retrieval_top_k=retrieval_top_k,
+            rerank_top_k=rerank_top_k,
             similarity_threshold=similarity_threshold,
+            
         )
-
         # 2. Stop if nothing relevant was retrieved
         if not retrieval.sources:
             return {
