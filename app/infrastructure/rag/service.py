@@ -47,12 +47,18 @@ class RAGService:
             similarity_threshold=similarity_threshold,
         )
         
+        print("========== RERANKER EXECUTED ==========")
         reranked_results = self.reranker_service.rerank(
             question=question,
             candidates=search_results,
             top_k=rerank_top_k,
         
         )
+        
+        
+        
+        print(f"Candidates returned by reranker: {len(reranked_results)}")
+        print("========== RERANKER END ==========")
 
         # 2. Stop if no relevant chunks were found
         if not reranked_results:
