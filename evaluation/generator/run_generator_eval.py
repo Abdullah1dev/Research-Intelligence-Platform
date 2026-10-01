@@ -1,8 +1,12 @@
+print(">>> FILE STARTED", flush=True)
+
 from app.features.users.models import User
 from app.features.papers.models import Paper, PaperDocument, DocumentChunk
 from app.features.conversations.models import Conversation
 
 from app.infrastructure.database.config import SessionLocal
+
+print(">>> RAG DEPENDENCY IMPORTED", flush=True)
 from app.infrastructure.rag.dependencies import get_rag_service
 
 from deepeval import evaluate
@@ -12,6 +16,8 @@ from deepeval.test_case import LLMTestCase
 from deepeval.evaluate import AsyncConfig , CacheConfig
 
 from evaluation.generator.metrics import get_answer_relevancy_metric
+print(">>> METRICS IMPORTED", flush=True)
+
 from pathlib import Path
 
 import json
@@ -27,12 +33,23 @@ DATASET_PATH = (
 
 
 def main():
+    
+    
+    print(">>> MAIN STARTED", flush=True)
+
 
     db = SessionLocal()
+    
+    print(">>> DATABASE SESSION CREATED", flush=True)
 
     try:
+        
+        print(">>> BEFORE get_rag_service()", flush=True)
+        
         rag_service = get_rag_service()
-
+        
+        print(">>> AFTER get_rag_service()", flush=True)
+        
         with open(
             DATASET_PATH,
             "r",
@@ -89,3 +106,9 @@ def main():
 
     finally:
         db.close()
+
+
+
+
+if __name__ == "__main__":
+    main()
