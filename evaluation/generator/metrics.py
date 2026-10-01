@@ -1,37 +1,19 @@
-import os
-
-from deepeval.metrics import (
-    AnswerRelevancyMetric,
-    FaithfulnessMetric,
-)
+from deepeval.metrics import AnswerRelevancyMetric
 from deepeval.models import OpenRouterModel
 
+from app.config.settings import settings
 
-def get_evaluation_metrics():
-    api_key = os.getenv("OPEN_AI_API_KEY")
 
-    if not api_key:
-        raise RuntimeError(
-            "OPEN_AI_API_KEY is not set."
-        )
-
+def get_answer_relevancy_metric():
     judge_model = OpenRouterModel(
-        model="qwen/qwen3.8-27b:free",
-        api_key=api_key,
+        model="openrouter/free",
+        api_key=settings.OPENROUTER_API_KEY,
         base_url="https://openrouter.ai/api/v1",
         temperature=0,
     )
 
-    faithfulness = FaithfulnessMetric(
+    return AnswerRelevancyMetric(
         model=judge_model,
         threshold=0.5,
         include_reason=True,
     )
-
-    answer_relevancy = AnswerRelevancyMetric(
-        model=judge_model,
-        threshold=0.5,
-        include_reason=True,
-    )
-
-    return faithfulness, answer_relevancy
