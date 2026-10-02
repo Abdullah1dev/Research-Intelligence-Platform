@@ -20,6 +20,8 @@ class Settings(BaseSettings):
 
     # OpenRouter
     OPENROUTER_API_KEY: str
+    GOOGLE_API_KEY: str
+    
     
     # Semantic Scholar
     SEMANTIC_SCHOLAR_API_KEY: str | None = None
