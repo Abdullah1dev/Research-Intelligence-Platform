@@ -20,7 +20,9 @@ class Settings(BaseSettings):
 
     # OpenRouter
     OPENROUTER_API_KEY: str
-
+    
+    # Google Gemini
+    GOOGLE_API_KEY: str
     
     
     # Semantic Scholar

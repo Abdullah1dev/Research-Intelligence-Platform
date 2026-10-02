@@ -1,14 +1,13 @@
 from deepeval.metrics import FaithfulnessMetric
-from deepeval.models import OpenRouterModel
+from deepeval.models import GeminiModel
 
 from app.config.settings import settings
 
 
 def get_faithfulness_metric():
-    judge_model = OpenRouterModel(
-        model="openrouter/free",
-        api_key=settings.OPENROUTER_API_KEY,
-        base_url="https://openrouter.ai/api/v1",
+    judge_model = GeminiModel(
+        model="gemini-3.5-flash-lite",
+        api_key=settings.GOOGLE_API_KEY,
         temperature=0,
     )
 
