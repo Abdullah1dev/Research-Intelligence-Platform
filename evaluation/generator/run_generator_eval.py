@@ -59,7 +59,7 @@ def main():
         # Q1 ONLY — first Faithfulness test
         # --------------------------------------------------------
 
-        for item in questions[:3]:
+        for item in questions[4:5]:
 
             question = item["question"]
             document_id = item["document_id"]
