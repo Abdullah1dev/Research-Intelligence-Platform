@@ -9,6 +9,8 @@ from app.infrastructure.rag.models import (
 )
 
 from app.infrastructure.rag.reranker import RerankerService
+import time
+
 
 class RAGService:
 
@@ -18,8 +20,6 @@ class RAGService:
         context_builder: RAGContextBuilder,
         reranker_service: RerankerService,
         llm_service: LLMService,
-        
-       
     ):
         self.vector_search_service = vector_search_service
         self.context_builder = context_builder
@@ -38,6 +38,8 @@ class RAGService:
         similarity_threshold: float = 0.5,
     ) -> RetrievalResult:
 
+        start = time.perf_counter()
+
         # 1. Search for relevant chunks
         search_results = self.vector_search_service.search(
             db=db,
@@ -46,18 +48,38 @@ class RAGService:
             top_k=retrieval_top_k,
             similarity_threshold=similarity_threshold,
         )
-        
+
+        vector_search_time = time.perf_counter() - start
+
+        print(
+            f"[LATENCY] Vector search: "
+            f"{vector_search_time:.3f}s",
+            flush=True,
+        )
+
+        start = time.perf_counter()
+
         print("========== RERANKER EXECUTED ==========")
+
         reranked_results = self.reranker_service.rerank(
             question=question,
             candidates=search_results,
             top_k=rerank_top_k,
-        
         )
-        
-        
-        
-        print(f"Candidates returned by reranker: {len(reranked_results)}")
+
+        reranker_time = time.perf_counter() - start
+
+        print(
+            f"[LATENCY] Reranker: "
+            f"{reranker_time:.3f}s",
+            flush=True,
+        )
+
+        print(
+            f"Candidates returned by reranker: "
+            f"{len(reranked_results)}"
+        )
+
         print("========== RERANKER END ==========")
 
         # 2. Stop if no relevant chunks were found
@@ -117,8 +139,10 @@ class RAGService:
         retrieval_top_k: int = 10,
         rerank_top_k: int = 4,
         similarity_threshold: float = 0.5,
-    
     ) -> dict:
+
+        # Start total request timer
+        request_start = time.perf_counter()
 
         # 1. Retrieve relevant information
         retrieval = self.retrieve(
@@ -128,10 +152,18 @@ class RAGService:
             retrieval_top_k=retrieval_top_k,
             rerank_top_k=rerank_top_k,
             similarity_threshold=similarity_threshold,
-            
         )
+
         # 2. Stop if nothing relevant was retrieved
         if not retrieval.sources:
+            total_time = time.perf_counter() - request_start
+
+            print(
+                f"[LATENCY] Total request: "
+                f"{total_time:.3f}s",
+                flush=True,
+            )
+
             return {
                 "answer": (
                     "I could not find relevant information "
@@ -167,11 +199,30 @@ Answer:
 """
 
         # 5. Generate answer
+        llm_start = time.perf_counter()
+
         answer = self.llm_service.generate(
             prompt
         )
 
-        # 6. Return answer and sources
+        llm_time = time.perf_counter() - llm_start
+
+        print(
+            f"[LATENCY] LLM generation: "
+            f"{llm_time:.3f}s",
+            flush=True,
+        )
+
+        # 6. Calculate total request time
+        total_time = time.perf_counter() - request_start
+
+        print(
+            f"[LATENCY] Total request: "
+            f"{total_time:.3f}s",
+            flush=True,
+        )
+
+        # 7. Return answer and sources
         return {
             "answer": answer,
             "sources": retrieval.sources,
