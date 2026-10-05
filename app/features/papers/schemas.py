@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict , HttpUrl , Field
+from pydantic import BaseModel, ConfigDict , HttpUrl , Field , field_validator
 from app.features.papers.enums import DocumentProcessingStatus
 
 
@@ -140,8 +140,19 @@ class PaperQuestionRequest(BaseModel):
     question: str = Field(
         ...,
         min_length=1,
+        max_length=1000,
         description="Question to ask about the paper",
     )
+
+    @field_validator("question")
+    @classmethod
+    def validate_question(cls, value: str) -> str:
+        value = value.strip()
+
+        if not value:
+            raise ValueError("Question cannot be empty or whitespace only.")
+
+        return value
     
     
     
