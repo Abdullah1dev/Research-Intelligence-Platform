@@ -1,0 +1,2 @@
+FROM ranaabdullahtahir/research-intelligence-backend:latest
+COPY . .

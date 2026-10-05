@@ -10,7 +10,7 @@ RESULTS_FILE = (
     Path(__file__).resolve().parents[2]
     / "evaluation"
     / "results"
-    / "retrieval_reranked_top5.json"
+    / "retrieval_reranked.json"
 )
 
 K_VALUES = [1, 2, 4, 10]
