@@ -10,14 +10,7 @@ def main():
         temperature=0,
     )
 
-    response = model.generate(
-        "Return a JSON object with exactly these fields: "
-        "score (number) and reason (string). "
-        "The score should be 1 and the reason should say 'test'."
-    )
-
-    print("\n========== JUDGE RESPONSE ==========")
-    print(response)
+    
 
 
 if __name__ == "__main__":
