@@ -113,10 +113,7 @@ def main():
 
         print("\nAll test cases created. Starting DeepEval...")
 
-        # --------------------------------------------------------
-        # Run Faithfulness evaluation
-        # --------------------------------------------------------
-
+        
         evaluate(
             test_cases=test_cases,
             metrics=[faithfulness],
